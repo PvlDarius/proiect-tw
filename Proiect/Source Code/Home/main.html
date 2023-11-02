@@ -3,9 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Clinic App</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/88f38507d4.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    <div class="navbar-container">
+        <label for="header" class="logo">Clinic App</label>
+        <input type="checkbox" name="nav_check" id="nav_check" hidden>
+        <nav>
+            <label class="logo">ClinicApp</label>
+            <ul id="links-container">
+                <li><a href="#general-info" class="nav-link active">General Info</a></li>
+                <li><a href="#our-doctors" class="nav-link">Our Doctors</a></li>
+                <li><a href="#about" class="nav-link">About Us</a></li>
+                <li><a href="#contact" class="nav-link">Contact</a></li>
+                <li>
+                    <a href="#" class="log-in-btn">
+                        <span>Log In</span>
+                        <i class="fa fa-user-circle" style="color: #fafafa;"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <label for="nav_check" class="hamburger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </label>
+    </div>
     
+    <div class="main-container">
+        <section id="general-info">
+            <div class="blank-space"></div>
+            <div class="general-info-container smooth">
+                <div class="image-container col-5">
+                    <img src="../Images/doctors-talking.jpg" alt="Doctors that are talking">
+                </div>
+                <div class="description-container col-5 smooth">
+                    <h2>What is "Clinic App"?</h2>
+                    <br>
+                    <div class="description-text">
+                        &ensp; "Clinic App" is a platform made for doctors to manage their patients more easily and keep track of thei medical records, previous and future visits.
+                        <br><br>
+                        &ensp; Also here, patients can check their records too and can book appointments to our registered doctors.
+                        <br><br>
+                        &ensp; We aim to make communication between doctors and patients much easier in a proffessional way.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="our-doctors">
+            <div class="blank-space"></div>
+            <br><br>
+            <h1 style="text-align: center;">Meet our trusted doctors</h1>
+            <div class="doctors-container col-10">
+                <div class="doctors-container-element smooth">
+                    <img src="../Images/DoctorA.png" alt="Doctor A">
+                    <h3>Doctor A</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur</p>
+                </div>
+                <div class="doctors-container-element smooth">
+                    <img src="../Images/DoctorB.jpg" alt="Doctor B">
+                    <h3>Doctor B</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur</p>
+                </div>
+                <div class="doctors-container-element smooth">
+                    <img src="../Images/DoctorC.jpg" alt="Doctor C">
+                    <h3>Doctor C</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur</p>
+                </div>
+                <div class="doctors-container-element smooth">
+                    <img src="../Images/DoctorD.jpg" alt="Doctor D">
+                    <h3>Doctor D</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur</p>
+                </div>
+                <div class="doctors-container-element smooth">
+                    <img src="../Images/DoctorE.jpg" alt="Doctor E">
+                    <h3>Doctor E</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur</p>
+                </div>
+                <div class="doctors-container-element smooth">
+                    <img src="../Images/DoctorF.jpg" alt="Doctor F">
+                    <h3>Doctor F</h3>
+                    <p>Lorem ipsum dolor sit amet consectetur</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="blank-space"></div>
+            <h1 style="text-align: center;">About Us</h1>
+            <br>
+            <p style="text-align: center;">Lorem ipsum dolor sit amet consectetur adipisicing elit. <br>Iste laboriosam recusandae eos accusamus a quas optio ducimus modi? <br>Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt aliquid recusandae temporibus! <br>Hic.</p>
+            <p style="text-align: center;">Lorem ipsum dolor sit amet consectetur adipisicing elit. <br>Iste laboriosam recusandae eos accusamus a quas optio ducimus modi? <br>Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt aliquid recusandae temporibus! <br>Hic.</p>
+            <p style="text-align: center;">Lorem ipsum dolor sit amet consectetur adipisicing elit. <br>Iste laboriosam recusandae eos accusamus a quas optio ducimus modi? <br>Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt aliquid recusandae temporibus! <br>Hic.</p>
+            <p style="text-align: center;">Lorem ipsum dolor sit amet consectetur adipisicing elit. <br>Iste laboriosam recusandae eos accusamus a quas optio ducimus modi? <br>Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt aliquid recusandae temporibus! <br>Hic.</p>
+            <p style="text-align: center;">Lorem ipsum dolor sit amet consectetur adipisicing elit. <br>Iste laboriosam recusandae eos accusamus a quas optio ducimus modi? <br>Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt aliquid recusandae temporibus! <br>Hic.</p>
+        </section>
+        <br><br><br>
+        <section id="contact">
+            <div class="blank-space"></div>
+            <h1 style="text-align: center;">Contact</h1>
+            <br>
+            <p style="text-align: center;">Lorem ipsum dolor sit amet consectetur adipisicing elit. <br>Iste laboriosam recusandae eos accusamus a quas optio ducimus modi? <br>Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt aliquid recusandae temporibus! <br>Hic.</p>
+            <p style="text-align: center;">Lorem ipsum dolor sit amet consectetur adipisicing elit. <br>Iste laboriosam recusandae eos accusamus a quas optio ducimus modi? <br>Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt aliquid recusandae temporibus! <br>Hic.</p>
+            <p style="text-align: center;">Lorem ipsum dolor sit amet consectetur adipisicing elit. <br>Iste laboriosam recusandae eos accusamus a quas optio ducimus modi? <br>Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt aliquid recusandae temporibus! <br>Hic.</p>
+            <p style="text-align: center;">Lorem ipsum dolor sit amet consectetur adipisicing elit. <br>Iste laboriosam recusandae eos accusamus a quas optio ducimus modi? <br>Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt aliquid recusandae temporibus! <br>Hic.</p>
+            <p style="text-align: center;">Lorem ipsum dolor sit amet consectetur adipisicing elit. <br>Iste laboriosam recusandae eos accusamus a quas optio ducimus modi? <br>Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt aliquid recusandae temporibus! <br>Hic.</p>
+        </section>
+        <div class="blank-space"></div>
+    </div>
+
+    <footer>
+        <div class="footer-logo"><span class="footer-logo-text">Clinic App</span></div>
+        <div class="contact-footer">
+            <span class="contact-footer-label">Contact</span><br><br>
+            <span>
+                <i class="fas fa-phone-alt" style="color: #fafafa;"></i> +40 700 000 000
+            </span><br>
+            <span>
+                <i class="fas fa-envelope" style="color: #fafafa;"></i> clinicapp@gmail.com
+            </span><br><br>
+            <i class="fab fa-facebook fa-lg" style="color: #fafafa; margin-right: 5px; cursor: pointer;"><a href="#facebook"></a></i>
+            <i class="fab fa-instagram fa-lg" style="color: #fafafa; margin-right: 5px; cursor: pointer;"><a href="#instagram"></a></i>
+            <i class="fab fa-twitter fa-lg" style="color: #fafafa; margin-right: 5px; cursor: pointer;"><a href="#twitter"></a></i>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
