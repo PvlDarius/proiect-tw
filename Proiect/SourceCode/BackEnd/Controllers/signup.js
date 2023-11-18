@@ -10,9 +10,12 @@ const db = mysql.createConnection({
 });
 
 exports.signup = (req, res) => {
-  console.log(req.body);
+  const { first_name, last_name, email, password, confirmPassword } = req.body;
 
-  const { name, email, password, confirmPassword } = req.body;
+  // Server-side validation for empty fields
+  if (!first_name || !last_name || !email || !password || !confirmPassword) {
+    return res.redirect("/signup?errorMessage=All fields are required");
+  }
 
   db.query(
     "SELECT email FROM users WHERE email = ?",
@@ -20,25 +23,22 @@ exports.signup = (req, res) => {
     async (error, results) => {
       if (error) {
         console.log(error);
+        return res.redirect("/signup?errorMessage=An error occurred");
       }
 
       if (results.length > 0) {
-        return res.render("signup", {
-          message: "This email is already used",
-        });
+        return res.redirect("/signup?errorMessage=This email is already used");
       } else if (password !== confirmPassword) {
-        return res.render("signup", {
-          message: "Passwords do not match",
-        });
+        return res.redirect("/signup?errorMessage=Passwords do not match");
       }
 
       let hashedPassword = await bcrypt.hash(password, 8);
-      console.log(hashedPassword);
 
       db.query(
         "INSERT INTO users SET ?",
         {
-          name: name,
+          first_name: first_name,
+          last_name: last_name,
           email: email,
           password: hashedPassword,
           user_role: "patient",
@@ -46,10 +46,11 @@ exports.signup = (req, res) => {
         (error, results) => {
           if (error) {
             console.log(error);
+            return res.redirect("/signup?errorMessage=Registration failed");
           } else {
-            return res.render("signup", {
-              message: "Signed in successfully!",
-            });
+            return res.redirect(
+              "/signup?successMessage=Signed in successfully!"
+            );
           }
         }
       );
