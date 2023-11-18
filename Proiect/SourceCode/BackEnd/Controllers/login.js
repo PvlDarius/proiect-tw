@@ -1,4 +1,3 @@
-// BackEnd/Controllers/login.js
 const mysql = require("mysql2/promise");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
@@ -16,15 +15,18 @@ const pool = mysql.createPool({
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
+  // Server-side validation for empty fields
+  if (!email || !password) {
+    return res.redirect("/login?errorMessage=All fields are required");
+  }
+
   try {
     const [result] = await pool.execute("SELECT * FROM users WHERE email = ?", [
       email,
     ]);
 
     if (!result.length) {
-      return res.render("login", {
-        message: "Email is not registered",
-      });
+      return res.redirect("/login?errorMessage=This user is not registered!");
     }
 
     const user = result[0];
@@ -32,9 +34,7 @@ exports.login = async (req, res) => {
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
-      return res.render("login", {
-        message: "Incorrect password!",
-      });
+      return res.redirect("/login?errorMessage=Incorrect password!");
     }
 
     const token = jwt.sign(
@@ -43,10 +43,14 @@ exports.login = async (req, res) => {
       { expiresIn: "8h" }
     );
 
-    // Set the token as a cookie (you can modify this based on your needs)
+    const isProduction = process.env.NODE_ENV === "production" || false;
+
+    // ...
+
     res.cookie("jwt", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isProduction,
+      sameSite: "Strict", // or "Lax"
     });
 
     req.user = user;
@@ -61,6 +65,6 @@ exports.login = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    return res.redirect("/login?errorMessage=An error occurred");
   }
 };

@@ -2,6 +2,8 @@ const express = require("express");
 const path = require("path");
 const mysql = require("mysql");
 const dotenv = require("dotenv");
+const authMiddleware = require("./Middlewares/authMiddleware");
+const cookieParser = require("cookie-parser");
 
 dotenv.config({ path: "./.env" });
 
@@ -22,6 +24,8 @@ db.connect((error) => {
   }
 });
 
+app.use(cookieParser());
+
 const checkUserRole = (req, res, next) => {
   // Assuming you store user info in req.user after authentication
   const userRole = req.user ? req.user.user_role : null;
@@ -32,9 +36,6 @@ const checkUserRole = (req, res, next) => {
 
   next();
 };
-
-// Use the middleware for all routes
-app.use(checkUserRole);
 
 // Serve static files from the "FrontEnd" directory
 app.use(express.static(path.join(__dirname, "../FrontEnd")));
@@ -49,16 +50,20 @@ app.set("views", path.join(__dirname, "../FrontEnd/LoginSignup"));
 app.use("/", require("./Routes/pages"));
 app.use("/auth", require("./Routes/auth"));
 
+// Use the middleware for all routes
+app.use(checkUserRole);
+app.use(authMiddleware);
+
 // Routes for different user roles
-app.get("/admin/home", checkUserRole, (req, res) => {
+app.get("/admin/home", (req, res) => {
   res.render("../Admin/admin-home");
 });
 
-app.get("/doctor/home", checkUserRole, (req, res) => {
+app.get("/doctor/home", (req, res) => {
   res.render("../Doctors/doctor-home");
 });
 
-app.get("/patient/home", checkUserRole, (req, res) => {
+app.get("/patient/home", (req, res) => {
   res.render("../Patients/patient-home");
 });
 

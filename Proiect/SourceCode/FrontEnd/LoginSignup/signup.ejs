@@ -3,31 +3,84 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" type="text/css" href="./login-signup.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="LoginSignup/login-signup.css"
+    />
+    <script
+      src="https://kit.fontawesome.com/88f38507d4.js"
+      crossorigin="anonymous"
+    ></script>
     <title>Sign Up</title>
   </head>
   <body>
-    <h1>Sign Up</h1>
-    <div class="form-container">
-      <form action="/auth/signup" method="POST">
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" />
-        <br /><br />
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" />
-        <br /><br />
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" />
-        <br /><br />
-        <label for="confirmPassword">Confirm Password</label>
-        <input type="password" id="confirmPassword" name="confirmPassword" />
-        <br /><br />
-        <input type="submit" />
-        <br /><br />
-        <span>Already have an account? <a href="/login">Log In</a></span>
-      </form>
+    <div class="container">
+      <div class="form-container">
+        <form
+          action="/auth/signup"
+          method="POST"
+          name="formFill"
+          onsubmit="return validateAndSubmitSignup()"
+          id="signupForm"
+        >
+          <h2>Sign Up</h2>
+          <p id="validation-message" class="validation-message"></p>
+          <p id="success-message" class="success-message"></p>
+          <div class="input-box">
+            <i class="fa-solid fa-user"></i>
+            <input
+              type="text"
+              id="first_name"
+              name="first_name"
+              placeholder="First Name"
+            />
+            <label id="first_name-validation"></label>
+          </div>
+          <div class="input-box">
+            <i class="fa-solid fa-users"></i>
+            <input
+              type="text"
+              id="last_name"
+              name="last_name"
+              placeholder="Last Name"
+            />
+            <label id="last_name-validation"></label>
+          </div>
+          <div class="input-box">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="email" name="email" placeholder="Email" />
+            <label id="email-validation"></label>
+          </div>
+          <div class="input-box">
+            <i class="fa-solid fa-lock"></i>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Password"
+            />
+            <label id="password-validation"></label>
+          </div>
+          <div class="input-box">
+            <i class="fa-solid fa-lock"></i>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              placeholder="Confirm Password"
+            />
+            <label id="confirmPassword-validation"></label>
+          </div>
+          <div class="submit-button">
+            <input class="button" type="submit" />
+          </div>
+          <div class="group">
+            <span>Already have an account? <a href="/login">Log In</a></span>
+          </div>
+        </form>
+      </div>
     </div>
-    <h4><%= message %></h4>
-    <script src="./login-signup.js"></script>
+    <script src="LoginSignup/login-signup.js"></script>
   </body>
 </html>
