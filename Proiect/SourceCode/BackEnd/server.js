@@ -54,16 +54,15 @@ app.use("/auth", require("./Routes/auth"));
 app.use(checkUserRole);
 app.use(authMiddleware);
 
-// Routes for different user roles
-app.get("/admin/home", (req, res) => {
+app.get("/admin/home", authMiddleware, (req, res) => {
   res.render("../Admin/admin-home");
 });
 
-app.get("/doctor/home", (req, res) => {
+app.get("/doctor/home", authMiddleware, (req, res) => {
   res.render("../Doctors/doctor-home");
 });
 
-app.get("/patient/home", (req, res) => {
+app.get("/patient/home", authMiddleware, (req, res) => {
   res.render("../Patients/patient-home");
 });
 
