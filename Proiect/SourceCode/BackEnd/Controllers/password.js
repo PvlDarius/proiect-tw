@@ -22,8 +22,8 @@ const transporter = nodemailer.createTransport({
   secureConnection: false,
   port: 587,
   auth: {
-    user: "tw.clinicapp@outlook.com",
-    pass: "Clinicappadmin",
+    user: process.env.EMAIL_ADDRESS,
+    pass: process.env.EMAIL_PASSWORD,
   },
   tls: {
     ciphers: "SSLv3",
@@ -55,7 +55,7 @@ exports.forgotPassword = async (req, res) => {
     );
 
     const mailOptions = {
-      from: "tw.clinicapp@outlook.com", // replace with your Gmail address
+      from: process.env.EMAIL_ADDRESS,
       to: email,
       subject: "Password Reset",
       text: `Click the following link to reset your password: http://localhost:8080/auth/reset-password?token=${resetToken}`,
@@ -79,9 +79,16 @@ exports.forgotPassword = async (req, res) => {
 };
 
 exports.resetPassword = async (req, res) => {
-  const { token, password } = req.body;
-
   try {
+    const token = req.body.token; // Extract token from the request body
+    console.log("Attempting to reset password for token:", token);
+
+    if (!token) {
+      return res.render("reset-password", {
+        message: "Invalid or expired reset token",
+      });
+    }
+
     const [result] = await pool.execute(
       "SELECT * FROM users WHERE resetToken = ? AND resetTokenExpiry > NOW()",
       [token]
@@ -93,18 +100,20 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
+    const password = req.body.password;
     const hashedPassword = await bcrypt.hash(password, 8);
+
     await pool.execute(
       "UPDATE users SET password = ?, resetToken = NULL, resetTokenExpiry = NULL WHERE resetToken = ?",
       [hashedPassword, token]
     );
 
-    res.render("reset-password", {
+    return res.render("reset-password", {
       message:
         "Password reset successful. You can now log in with your new password.",
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Error resetting password:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

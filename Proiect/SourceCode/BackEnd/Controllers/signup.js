@@ -12,7 +12,6 @@ const db = mysql.createConnection({
 exports.signup = (req, res) => {
   const { first_name, last_name, email, password, confirmPassword } = req.body;
 
-  // Server-side validation for empty fields
   if (!first_name || !last_name || !email || !password || !confirmPassword) {
     return res.redirect("/signup?errorMessage=All fields are required");
   }

@@ -1,59 +1,135 @@
-const sections = document.querySelectorAll('section');
-const navLinks = document.querySelectorAll('nav ul li a');
+let menuBtn = document.querySelector("#menu-btn");
+let navbar = document.querySelector(".navbar");
 
-function updateActiveLink() {
-    let current = '';
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        if (scrollY >= sectionTop) {
-            current = section.getAttribute('id');
-        }
-    });
+menuBtn.onclick = () => {
+  menuBtn.classList.toggle("fa-times");
+  navbar.classList.toggle("active");
+};
 
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href').includes(current)) {
-            link.classList.add('active');
-        }
-    });
-}
+window.onscroll = () => {
+  menuBtn.classList.remove("fa-times");
+  navbar.classList.remove("active");
+};
 
-navLinks.forEach(link => {
-    link.addEventListener('click', function (e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href').substring(1);
-        const targetSection = document.getElementById(targetId);
-        window.scrollTo({
-            top: targetSection.offsetTop,
-            behavior: 'smooth'
-        });
+document.addEventListener("DOMContentLoaded", function () {
+  // Handle section links
+  const sectionLinks = document.querySelectorAll(".section-link");
+  sectionLinks.forEach((link) => {
+    link.addEventListener("click", function (event) {
+      event.preventDefault();
+      const targetSection = this.getAttribute("data-target");
+      scrollToSection(targetSection);
     });
+  });
+
+  // Your existing code here
+
+  // Function to scroll to a section
+  function scrollToSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({
+        behavior: "smooth",
+      });
+    }
+  }
 });
 
-window.addEventListener('scroll', updateActiveLink);
+const imageFolderPath = "../Images/";
 
-function animateDivsOnLoad() {
-    const divs = document.querySelectorAll('.smooth');
-    divs.forEach((div, index) => {
-      setTimeout(() => {
-        div.style.opacity = 1;
-        div.style.transform = 'translateY(0)';
-      }, index * 500);
-    });
+async function fetchDoctors() {
+  try {
+    const response = await fetch("/api/doctors");
+    if (!response.ok) {
+      throw new Error(`Error fetching doctors: ${response.statusText}`);
+    }
+
+    const doctors = await response.json();
+    return doctors;
+  } catch (error) {
+    console.error("Error fetching doctors:", error.message);
+    return []; // Return an empty array to prevent 'undefined' error
+  }
 }
 
-function animateDivsOnScroll() {
-    const divs = document.querySelectorAll('.myDiv');
-    divs.forEach((div, index) => {
-      const divTop = div.getBoundingClientRect().top;
-      if (divTop - window.innerHeight < 0) {
-        setTimeout(() => {
-          div.style.opacity = 1;
-          div.style.transform = 'translateY(0)';
-        }, index * 500); // Adjust the delay to control the staggered appearance
-      }
-    });
+function renderDoctors(doctors) {
+  const doctorsContainer = document.querySelector(".doctors .box-container");
+
+  if (!doctors || !Array.isArray(doctors)) {
+    console.error("Invalid or empty doctors data:", doctors);
+    return;
   }
 
-window.addEventListener('load', animateDivsOnLoad);
-window.addEventListener('scroll', animateDivsOnScroll); 
+  doctors.forEach((doctor) => {
+    const doctorElement = document.createElement("div");
+    doctorElement.classList.add("box");
+
+    const doctorImage = document.createElement("img");
+    doctorImage.src = imageFolderPath + doctor.image;
+    doctorImage.alt = doctor.name;
+    doctorElement.appendChild(doctorImage);
+
+    const doctorName = document.createElement("h3");
+    doctorName.textContent = doctor.name;
+    doctorElement.appendChild(doctorName);
+
+    const doctorSpecialization = document.createElement("span");
+    doctorSpecialization.textContent = doctor.specialization;
+    doctorElement.appendChild(doctorSpecialization);
+
+    doctorsContainer.appendChild(doctorElement);
+  });
+}
+
+async function fetchAndRenderDoctors() {
+  const doctorsData = await fetchDoctors();
+  renderDoctors(doctorsData);
+}
+
+document.addEventListener("DOMContentLoaded", fetchAndRenderDoctors);
+
+async function fetchStatistics() {
+  const response = await fetch("/api/statistics");
+  const data = await response.json();
+  return data;
+}
+
+async function updateStatistics() {
+  try {
+    const statistics = await fetchStatistics();
+
+    const doctorsCounter = document.querySelector(
+      ".icons-container .icons:nth-child(1) h3"
+    );
+    const patientsCounter = document.querySelector(
+      ".icons-container .icons:nth-child(2) h3"
+    );
+    const hospitalsCounter = document.querySelector(
+      ".icons-container .icons:nth-child(3) h3"
+    );
+    const diagnosticsCounter = document.querySelector(
+      ".icons-container .icons:nth-child(4) h3"
+    );
+
+    if (doctorsCounter) {
+      doctorsCounter.textContent = statistics.doctorsCount || "N/A";
+    }
+
+    if (patientsCounter) {
+      patientsCounter.textContent = statistics.patientsCount || "N/A";
+    }
+
+    if (hospitalsCounter) {
+      hospitalsCounter.textContent = statistics.hospitalsCount || "N/A";
+    }
+
+    if (diagnosticsCounter) {
+      diagnosticsCounter.textContent = statistics.diagnosticsCount || "N/A";
+    }
+  } catch (error) {
+    console.error("Error updating statistics:", error);
+  }
+}
+
+// Call updateStatistics when the page loads
+document.addEventListener("DOMContentLoaded", updateStatistics);
