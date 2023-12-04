@@ -15,7 +15,6 @@ const pool = mysql.createPool({
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
-  // Server-side validation for empty fields
   if (!email || !password) {
     return res.redirect("/login?errorMessage=All fields are required");
   }
@@ -45,12 +44,10 @@ exports.login = async (req, res) => {
 
     const isProduction = process.env.NODE_ENV === "production" || false;
 
-    // ...
-
     res.cookie("jwt", token, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: "Strict", // or "Lax"
+      sameSite: "Strict",
     });
 
     req.user = user;
@@ -61,7 +58,7 @@ exports.login = async (req, res) => {
     } else if (user.user_role === "doctor") {
       return res.redirect("/doctor/home");
     } else {
-      return res.redirect("/patient/home");
+      return res.redirect("/patient/");
     }
   } catch (error) {
     console.error(error);

@@ -14,9 +14,9 @@ router.get("/forgot-password", (req, res) => {
   });
 });
 
-router.get("/reset-password/:token", (req, res) => {
-  const { token } = req.params;
-  console.log("Reset Password Token:", token); //debugging
+router.get("/reset-password", (req, res) => {
+  const token = req.query.token; // Use req.query to get the token from query parameters
+  console.log("Reset Password Token:", token); // Debugging
   res.render("reset-password", {
     token,
     message: "",

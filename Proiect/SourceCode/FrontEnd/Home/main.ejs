@@ -11,200 +11,156 @@
     ></script>
   </head>
   <body>
-    <div class="navbar-container">
-      <label for="header" class="logo">ClinicApp</label>
-      <input type="checkbox" name="nav_check" id="nav_check" hidden />
-      <nav>
-        <label class="logo">ClinicApp</label>
-        <ul id="links-container">
-          <li>
-            <a href="#general-info" class="nav-link active">General Info</a>
-          </li>
-          <li><a href="#our-doctors" class="nav-link">Our Doctors</a></li>
-          <li><a href="#about" class="nav-link">About Us</a></li>
-          <li><a href="#contact" class="nav-link">Contact</a></li>
-          <a href="/login" class="log-in-btn">
-            <span>Log In</span>
-            <i class="fa fa-user-circle" style="color: #fafafa"></i>
-          </a>
-        </ul>
+    <header class="header">
+      <a href="#" class="logo"><i class="fas fa-heartbeat"></i>ClinicApp</a>
+      <nav class="navbar">
+        <a href="#" class="section-link" data-target="home">Home</a>
+        <a href="#" class="section-link" data-target="services">Services</a>
+        <a href="#" class="section-link" data-target="about">About</a>
+        <a href="#" class="section-link" data-target="doctors">Doctors</a>
       </nav>
-      <label for="nav_check" class="hamburger">
-        <div></div>
-        <div></div>
-        <div></div>
-      </label>
-    </div>
 
-    <div class="main-container">
-      <section id="general-info">
-        <div class="blank-space"></div>
-        <div class="general-info-container smooth">
-          <div class="image-container col-5">
-            <img
-              src="../Images/doctors-talking.jpg"
-              alt="Doctors that are talking"
-            />
-          </div>
-          <div class="description-container col-5 smooth">
-            <h2>What is "Clinic App"?</h2>
-            <br />
-            <div class="description-text">
-              &ensp; "Clinic App" is a platform made for doctors to manage their
-              patients more easily and keep track of thei medical records,
-              previous and future visits.
-              <br /><br />
-              &ensp; Also here, patients can check their records too and can
-              book appointments to our registered doctors.
-              <br /><br />
-              &ensp; We aim to make communication between doctors and patients
-              much easier in a proffessional way.
-            </div>
-          </div>
-        </div>
-      </section>
+      <div id="menu-btn" class="fas fa-bars"></div>
+    </header>
 
-      <section id="our-doctors">
-        <div class="blank-space"></div>
-        <br /><br />
-        <h1 style="text-align: center">Meet our trusted doctors</h1>
-        <div class="doctors-container col-10">
-          <div class="doctors-container-element smooth">
-            <img src="../Images/DoctorA.png" alt="Doctor A" />
-            <h3>Doctor A</h3>
-            <p>Lorem ipsum dolor sit amet consectetur</p>
-          </div>
-          <div class="doctors-container-element smooth">
-            <img src="../Images/DoctorB.jpg" alt="Doctor B" />
-            <h3>Doctor B</h3>
-            <p>Lorem ipsum dolor sit amet consectetur</p>
-          </div>
-          <div class="doctors-container-element smooth">
-            <img src="../Images/DoctorC.jpg" alt="Doctor C" />
-            <h3>Doctor C</h3>
-            <p>Lorem ipsum dolor sit amet consectetur</p>
-          </div>
-          <div class="doctors-container-element smooth">
-            <img src="../Images/DoctorD.jpg" alt="Doctor D" />
-            <h3>Doctor D</h3>
-            <p>Lorem ipsum dolor sit amet consectetur</p>
-          </div>
-          <div class="doctors-container-element smooth">
-            <img src="../Images/DoctorE.jpg" alt="Doctor E" />
-            <h3>Doctor E</h3>
-            <p>Lorem ipsum dolor sit amet consectetur</p>
-          </div>
-          <div class="doctors-container-element smooth">
-            <img src="../Images/DoctorF.jpg" alt="Doctor F" />
-            <h3>Doctor F</h3>
-            <p>Lorem ipsum dolor sit amet consectetur</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="about">
-        <div class="blank-space"></div>
-        <h1 style="text-align: center">About Us</h1>
-        <br />
-        <p style="text-align: center">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. <br />Iste
-          laboriosam recusandae eos accusamus a quas optio ducimus modi?
-          <br />Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt
-          aliquid recusandae temporibus! <br />Hic.
-        </p>
-        <p style="text-align: center">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. <br />Iste
-          laboriosam recusandae eos accusamus a quas optio ducimus modi?
-          <br />Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt
-          aliquid recusandae temporibus! <br />Hic.
-        </p>
-        <p style="text-align: center">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. <br />Iste
-          laboriosam recusandae eos accusamus a quas optio ducimus modi?
-          <br />Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt
-          aliquid recusandae temporibus! <br />Hic.
-        </p>
-        <p style="text-align: center">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. <br />Iste
-          laboriosam recusandae eos accusamus a quas optio ducimus modi?
-          <br />Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt
-          aliquid recusandae temporibus! <br />Hic.
-        </p>
-        <p style="text-align: center">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. <br />Iste
-          laboriosam recusandae eos accusamus a quas optio ducimus modi?
-          <br />Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt
-          aliquid recusandae temporibus! <br />Hic.
-        </p>
-      </section>
-      <br /><br /><br />
-      <section id="contact">
-        <div class="blank-space"></div>
-        <h1 style="text-align: center">Contact</h1>
-        <br />
-        <p style="text-align: center">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. <br />Iste
-          laboriosam recusandae eos accusamus a quas optio ducimus modi?
-          <br />Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt
-          aliquid recusandae temporibus! <br />Hic.
-        </p>
-        <p style="text-align: center">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. <br />Iste
-          laboriosam recusandae eos accusamus a quas optio ducimus modi?
-          <br />Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt
-          aliquid recusandae temporibus! <br />Hic.
-        </p>
-        <p style="text-align: center">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. <br />Iste
-          laboriosam recusandae eos accusamus a quas optio ducimus modi?
-          <br />Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt
-          aliquid recusandae temporibus! <br />Hic.
-        </p>
-        <p style="text-align: center">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. <br />Iste
-          laboriosam recusandae eos accusamus a quas optio ducimus modi?
-          <br />Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt
-          aliquid recusandae temporibus! <br />Hic.
-        </p>
-        <p style="text-align: center">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. <br />Iste
-          laboriosam recusandae eos accusamus a quas optio ducimus modi?
-          <br />Molestiae, ipsum? Commodi voluptate laborum a tenetur incidunt
-          aliquid recusandae temporibus! <br />Hic.
-        </p>
-      </section>
-      <div class="blank-space"></div>
-    </div>
-
-    <footer>
-      <div class="footer-logo">
-        <span class="footer-logo-text">Clinic App</span>
+    <section class="home" id="home">
+      <div class="image">
+        <img src="../Images/Online-Doctor.jpg" alt="" />
       </div>
-      <div class="contact-footer">
-        <span class="contact-footer-label">Contact</span><br /><br />
-        <span>
-          <i class="fas fa-phone-alt" style="color: #fafafa"></i> +40 700 000
-          000 </span
-        ><br />
-        <span>
-          <i class="fas fa-envelope" style="color: #fafafa"></i>
-          clinicapp@gmail.com </span
-        ><br /><br />
-        <i
-          class="fab fa-facebook fa-lg"
-          style="color: #fafafa; margin-right: 5px; cursor: pointer"
-          ><a href="#facebook"></a
-        ></i>
-        <i
-          class="fab fa-instagram fa-lg"
-          style="color: #fafafa; margin-right: 5px; cursor: pointer"
-          ><a href="#instagram"></a
-        ></i>
-        <i
-          class="fab fa-twitter fa-lg"
-          style="color: #fafafa; margin-right: 5px; cursor: pointer"
-          ><a href="#twitter"></a
-        ></i>
+
+      <div class="content">
+        <h3>Stay safe, stay healthy!</h3>
+        <p>
+          &ensp; "Clinic App" is a platform made for doctors to manage their
+          patients more easily and keep track of thei medical records, previous
+          and future visits. <br />
+          &ensp; Also here, patients can check their records too and can book
+          appointments to our registered doctors.
+          <br />
+          &ensp; We aim to make communication between doctors and patients much
+          easier in a proffessional way.
+        </p>
+        <a href="/login" class="btn"
+          >Join our app!<span class="fas fa-chevron-right"></span
+        ></a>
+      </div>
+    </section>
+
+    <section class="icons-container">
+      <div class="icons">
+        <i class="fas fa-user-md"></i>
+        <h3></h3>
+        <p>Doctors registered</p>
+      </div>
+
+      <div class="icons">
+        <i class="fas fa-users"></i>
+        <h3></h3>
+        <p>Patients registered</p>
+      </div>
+
+      <div class="icons">
+        <i class="fas fa-procedures"></i>
+        <h3></h3>
+        <p>Diagnostics discovered</p>
+      </div>
+
+      <div class="icons">
+        <i class="fas fa-hospital"></i>
+        <h3></h3>
+        <p>Collaborating hospitals</p>
+      </div>
+    </section>
+
+    <section class="services" id="services">
+      <h1 class="heading">Our <span>services</span></h1>
+      <div class="box-container">
+        <div class="box">
+          <i class="fas fa-notes-medical"></i>
+          <h3>Free medical file checking</h3>
+          <p>A fost odata ca niciodata</p>
+          <a href="#" class="btn"
+            >Join our app!<span class="fas fa-chevron-right"></span
+          ></a>
+        </div>
+
+        <div class="box">
+          <i class="fas fa-calendar-days"></i>
+          <h3>Free appointment making</h3>
+          <p>A fost odata ca niciodata</p>
+          <a href="#" class="btn"
+            >Join our app!<span class="fas fa-chevron-right"></span
+          ></a>
+        </div>
+
+        <div class="box">
+          <i class="fas fa-user-md"></i>
+          <h3>Expert doctors</h3>
+          <p>A fost odata ca niciodata</p>
+          <a href="#" class="btn"
+            >Join our app!<span class="fas fa-chevron-right"></span
+          ></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="about" id="about">
+      <h1 class="heading"><span>About</span> us</h1>
+      <div class="row">
+        <div class="image">
+          <img src="../Images/doctors-talking.jpg" alt="" />
+        </div>
+        <div class="content">
+          <h3>We take care of your health so you can be healthy</h3>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Suscipit
+            inventore, accusamus atque nobis earum quisquam quae tempore
+            sapiente omnis tempora adipisci placeat nemo non cupiditate eos.
+            Distinctio sit deleniti accusamus?
+          </p>
+          <p>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore
+            culpa fugiat necessitatibus quaerat nobis sit sapiente temporibus
+            voluptate ipsam veniam.
+          </p>
+          <a href="#" class="btn"
+            >Join our app!<span class="fas fa-chevron-right"></span
+          ></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="doctors" id="doctors">
+      <h1 class="heading">Our <span>doctors</span></h1>
+      <div class="box-container"></div>
+    </section>
+
+    <footer class="footer">
+      <div class="box-container">
+        <div class="box">
+          <h3>Quick links</h3>
+          <a href="#home"><i class="fas fa-chevron-right"></i> Home </a>
+          <a href="#services"><i class="fas fa-chevron-right"></i> Services </a>
+          <a href="#about"><i class="fas fa-chevron-right"></i> About </a>
+          <a href="#doctors"><i class="fas fa-chevron-right"></i> Doctors </a>
+        </div>
+
+        <div class="box">
+          <h3>Contact info</h3>
+          <a href="#"><i class="fas fa-phone"></i> +40 740 123 456 </a>
+          <a href="#"><i class="fas fa-envelope"></i> clinicapp@gmail.com </a>
+        </div>
+
+        <div class="box">
+          <h3>Other links</h3>
+          <a href="https://github.com/PvlDarius/proiect-tw"
+            ><i class="fa-brands fa-github"></i>Github repository</a
+          >
+        </div>
+      </div>
+
+      <div class="credit">
+        Created by <span>Darius, Denis, Georgiana</span> | All Rights Reserved
       </div>
     </footer>
 
