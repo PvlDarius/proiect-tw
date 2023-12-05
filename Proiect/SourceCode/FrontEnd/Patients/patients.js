@@ -9,7 +9,31 @@ menu_toggle.addEventListener("click", () => {
 const imageFolderPath = "../Images/";
 
 function renderDoctors(doctors) {
+  // Get the current active page
+  const activePage = document
+    .querySelector(".menu-item.active")
+    .getAttribute("data-page");
+
+  // Check if the current active page is "Appointments"
+  if (activePage !== "appointments") {
+    // If not "Appointments," do nothing and return
+    return;
+  }
+
+  doctors.sort((a, b) =>
+    a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+  );
+
   const doctorsContainer = document.querySelector(".doctors-container");
+
+  // Check if doctorsContainer is null before proceeding
+  if (!doctorsContainer) {
+    console.error("Error: doctorsContainer is null");
+    return;
+  }
+
+  // Clear existing content in the container
+  doctorsContainer.innerHTML = "";
 
   doctors.forEach((doctor) => {
     const doctorElement = document.createElement("div");
@@ -88,17 +112,18 @@ function setActiveLink(page) {
 
 async function loadPage(page) {
   try {
+    // Fetch the content for the specified page
     const response = await fetch(`/patient/${page}`);
     const pageContent = await response.text();
+
+    // Replace the content in the .main-content container
     document.querySelector(".main-content").innerHTML = pageContent;
 
     // Set the active link when a new page is loaded
     setActiveLink(page);
 
-    // Re-fetch and render doctors if returning to the home page
-    if (page === "home") {
-      await fetchAndRenderDoctors();
-    }
+    // Re-fetch and render doctors for all pages
+    await fetchAndRenderDoctors();
   } catch (error) {
     console.error("Error loading page:", error);
   }
