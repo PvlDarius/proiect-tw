@@ -131,5 +131,32 @@ async function updateStatistics() {
   }
 }
 
-// Call updateStatistics when the page loads
 document.addEventListener("DOMContentLoaded", updateStatistics);
+
+let header = document.querySelector(".header");
+// let serviceBox = document.querySelector(".services .box-container .box");
+// let doctorBox = document.querySelector(".doctors .box-container .box");
+
+let isDarkMode = false; // Variable to track the current mode
+
+function toggleDarkMode() {
+  isDarkMode = !isDarkMode; // Toggle the mode
+
+  document.body.classList.toggle("dark-mode", isDarkMode);
+
+  const modeIcon = document.getElementById("modeIcon");
+  modeIcon.classList.toggle("fa-moon", !isDarkMode);
+  modeIcon.classList.toggle("fa-sun", isDarkMode);
+
+  header.classList.toggle("dark-mode", isDarkMode);
+  // serviceBox.classList.toggle("dark-mode", isDarkMode);
+  // doctorBox.classList.toggle("dark-mode", isDarkMode);
+
+  localStorage.setItem("darkMode", isDarkMode);
+}
+
+const storedDarkMode = localStorage.getItem("darkMode");
+if (storedDarkMode) {
+  isDarkMode = JSON.parse(storedDarkMode);
+  toggleDarkMode();
+}
