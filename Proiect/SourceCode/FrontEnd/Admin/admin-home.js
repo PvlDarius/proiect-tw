@@ -29,16 +29,15 @@ function createAccount() {
 }
 
 function updateAppointmentStats() {
-  document.getElementById('lastMonthAppointments').textContent = '5'; // Exemplu hardcodat
-  document.getElementById('lastYearAppointments').textContent = '50'; // Exemplu hardcodat
+  document.getElementById('lastMonthAppointments').textContent = '5'; 
+  document.getElementById('lastYearAppointments').textContent = '50'; 
 }
 
 function updateDiagnosesStats() {
-  document.getElementById('lastMonthDiagnoses').textContent = '10'; // Exemplu hardcodat
-  document.getElementById('lastYearDiagnoses').textContent = '100'; // Exemplu hardcodat
+  document.getElementById('lastMonthDiagnoses').textContent = '10'; 
+  document.getElementById('lastYearDiagnoses').textContent = '100'; 
 }
 
-// Restul codului...
 
 function viewDoctorAccounts() {
   alert(JSON.stringify(doctorAccounts, null, 2));
@@ -81,4 +80,6 @@ function updateAppointmentStats() {
 
 }
 
-
+/*document.getElementById("nana").onclick = function(){
+  location.href = 'view-doctor-accounts.html'
+}*/
