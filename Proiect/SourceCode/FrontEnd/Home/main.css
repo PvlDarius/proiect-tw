@@ -1,4 +1,4 @@
-/* Full document */
+
 @import url('https://fonts.googleapis.com/css?family=Poppins');
 
 :root{
@@ -31,7 +31,6 @@ html{
     scroll-behavior: smooth;
 }
 
-/* Header styling */
 
 .header{
     padding: 2rem 9%;
@@ -76,7 +75,6 @@ html{
     display: none;
 }
 
-/* First section */
 
 section{
     padding: 2rem 9%;
@@ -147,7 +145,6 @@ section{
     margin-left: 1rem;
 }
 
-/* Second section */
 
 .icons-container{
     display: grid;
@@ -236,7 +233,6 @@ section:nth-child(even){
     color: var(--blue);
 }
 
-/* Fourth section */
 
 .about .row{
     display: flex;
@@ -271,7 +267,6 @@ section:nth-child(even){
     line-height: 1.8;
 }
 
-/* Fifth section */
 
 .doctors .box-container{
     display: grid;
@@ -307,7 +302,6 @@ section:nth-child(even){
     font-size: 1.5rem;
 }
 
-/* Footer */
 
 .footer .box-container{
     display: grid;

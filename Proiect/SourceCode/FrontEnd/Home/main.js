@@ -22,9 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // Your existing code here
-
-  // Function to scroll to a section
+  
   function scrollToSection(sectionId) {
     const section = document.getElementById(sectionId);
     if (section) {
@@ -48,7 +46,7 @@ async function fetchDoctors() {
     return doctors;
   } catch (error) {
     console.error("Error fetching doctors:", error.message);
-    return []; // Return an empty array to prevent 'undefined' error
+    return []; 
   }
 }
 
@@ -131,5 +129,4 @@ async function updateStatistics() {
   }
 }
 
-// Call updateStatistics when the page loads
 document.addEventListener("DOMContentLoaded", updateStatistics);

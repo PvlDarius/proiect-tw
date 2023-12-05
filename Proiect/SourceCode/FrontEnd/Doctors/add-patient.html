@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Patient</title>
+  <link rel="stylesheet" href="doctor-home.css">
+  <link rel="stylesheet" href="add-patient.css">
+</head>
+<body>
+
+<div class="container">
+  <h2>Add Patient</h2>
+  <form>
+    <label for="patientName">Patient Name:</label>
+    <input type="text" id="patientName" name="patientName" required>
+
+    <label for="patientDiagnosis">Diagnosis:</label>
+    <input type="text" id="patientDiagnosis" name="patientDiagnosis" required>
+
+    <button type="button" onclick="addPatient()">Add Patient</button>
+  </form>
+</div>
+
+<script src="doctor-home.js"></script>
+<script src="add-patient.js"></script>
+</body>
+</html>

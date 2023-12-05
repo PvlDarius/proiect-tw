@@ -4,9 +4,25 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home</title>
+    <link rel="stylesheet" href="admin-home.css">
   </head>
   <body>
-    <h1>Manager's Home Page</h1>
-    <a href="/auth/logout">Log Out</a>
+    <div class="container">
+      <h2 class="form-title">Home Page</h2>
+      <form>
+        <a href="/auth/logout">Log Out</a>
+
+      <div id="actions">
+        <!-- <button id="nana">nana</button> -->
+        <a href="view-doctor-accounts.html">View Doctor Accounts</a><br>
+        <a href="view-patient-accounts.html">View Patient Accounts</a><br>
+        <a href="create-doctor-account.html">Create Doctor Account</a><br>
+        <a href="stats-appointments.html">Appointment Statistics</a><br>
+        <a href="stats-diagnoses.html">Diagnoses Statistics</a><br>
+      </div>
+      </form>
+      </div>
+    </div>
+    <script src="admin-home.js"></script>
   </body>
 </html>

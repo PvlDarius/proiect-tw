@@ -61,14 +61,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const defaultPage = currentPath || "home";
   setActiveLink(defaultPage);
 
-  // Trigger the initial load when the page is refreshed
   loadPage(defaultPage);
 });
 
-// Add a separate event listener for the logout link
 const logoutLink = document.querySelector(".menu-item[data-page='logout']");
 logoutLink.addEventListener("click", () => {
-  // Simply follow the logout link without preventing the default behavior
   window.location.href = logoutLink.getAttribute("href");
 });
 
@@ -92,10 +89,8 @@ async function loadPage(page) {
     const pageContent = await response.text();
     document.querySelector(".main-content").innerHTML = pageContent;
 
-    // Set the active link when a new page is loaded
     setActiveLink(page);
 
-    // Re-fetch and render doctors if returning to the home page
     if (page === "home") {
       await fetchAndRenderDoctors();
     }

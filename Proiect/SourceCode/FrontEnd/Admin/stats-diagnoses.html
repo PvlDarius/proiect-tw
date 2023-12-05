@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnostic Statistics</title>
+  <link rel="stylesheet" href="stats-appointments.css">
+  <style>
+    table {
+      width: 80%;
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 15px; 
+      text-align: center;
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Diagnostic Statistics</h1>
+  <a href="admin-home.ejs">Back to Main Page</a>
+  <br>
+  <div id="diagnosesStats">
+    <table>
+      <tr>
+        <th>Diagnosis</th>
+        <th>Last Month</th>
+        <th>Last Year</th>
+        <th>Doctor</th>
+      </tr>
+      <tr>
+        <td>Diabetes Mellitus</td>
+        <td><span id="diabetesLastMonth">2</span></td>
+        <td><span id="diabetesLastYear">15</span></td>
+        <td>Dr. Mares</td>
+      </tr>
+      <tr>
+        <td>Depression</td>
+        <td><span id="depressionLastMonth">5</span></td>
+        <td><span id="depressionLastYear">30</span></td>
+        <td>Dr. Radu</td>
+      </tr>
+      <tr>
+        <td>Hypertension</td>
+        <td><span id="hypertensionLastMonth">10</span></td>
+        <td><span id="hypertensionLastYear">80</span></td>
+        <td>Dr. Stoica</td>
+      </tr>
+      <tr>
+        <td>Anemia</td>
+        <td><span id="anemiaLastMonth">3</span></td>
+        <td><span id="anemiaLastYear">25</span></td>
+        <td>Dr. Ionescu</td>
+      </tr>
+      <tr>
+        <td>Insomnia</td>
+        <td><span id="insomniaLastMonth">7</span></td>
+        <td><span id="insomniaLastYear">50</span></td>
+        <td>Dr. Popa</td>
+      </tr>
+      <!-- Add rows for other diagnoses -->
+    </table>
+  </div>
+</div>
+
+<script src="admin-home.js"></script>
+</body>
+</html>

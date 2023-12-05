@@ -10,7 +10,7 @@
 }
 
 body{
-    background: url(../Images/health-app.png) no-repeat;
+    background: url(./Public/Images/health-app.png) no-repeat;
     background-position: center;
     background-size: cover;
     min-height: 100vh;
