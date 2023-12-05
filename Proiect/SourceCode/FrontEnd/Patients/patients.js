@@ -1,42 +1,66 @@
-const menu_toggle = document.querySelector(".menu-toggle");
+const menuToggle = document.querySelector(".menu-toggle");
 const sidebar = document.querySelector(".sidebar");
 
-menu_toggle.addEventListener("click", () => {
-  menu_toggle.classList.toggle("is-active");
+menuToggle.addEventListener("click", () => {
+  menuToggle.classList.toggle("is-active");
   sidebar.classList.toggle("is-active");
 });
 
 const imageFolderPath = "../Images/";
 
-function renderDoctors(doctors) {
+function renderDoctors(doctors, searchQuery = "") {
+  const activePage = document
+    .querySelector(".menu-item.active")
+    .getAttribute("data-page");
+
+  if (activePage !== "appointments") {
+    return;
+  }
+
+  doctors.sort((a, b) =>
+    a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
+  );
+
   const doctorsContainer = document.querySelector(".doctors-container");
 
+  if (!doctorsContainer) {
+    console.error("Error: doctorsContainer is null");
+    return;
+  }
+
+  doctorsContainer.innerHTML = "";
+
   doctors.forEach((doctor) => {
-    const doctorElement = document.createElement("div");
-    doctorElement.classList.add("doctors-container-element");
+    if (
+      doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doctor.specialization.toLowerCase().includes(searchQuery.toLowerCase())
+    ) {
+      const doctorElement = document.createElement("div");
+      doctorElement.classList.add("doctors-container-element");
 
-    const doctorImage = document.createElement("img");
-    doctorImage.src = imageFolderPath + doctor.image;
-    doctorImage.alt = doctor.name;
-    doctorElement.appendChild(doctorImage);
+      const doctorImage = document.createElement("img");
+      doctorImage.src = imageFolderPath + doctor.image;
+      doctorImage.alt = doctor.name;
+      doctorElement.appendChild(doctorImage);
 
-    const doctorName = document.createElement("h3");
-    doctorName.textContent = doctor.name;
-    doctorElement.appendChild(doctorName);
+      const doctorName = document.createElement("h3");
+      doctorName.textContent = doctor.name;
+      doctorElement.appendChild(doctorName);
 
-    const doctorSpecialization = document.createElement("p");
-    doctorSpecialization.textContent = doctor.specialization;
-    doctorElement.appendChild(doctorSpecialization);
+      const doctorSpecialization = document.createElement("p");
+      doctorSpecialization.textContent = doctor.specialization;
+      doctorElement.appendChild(doctorSpecialization);
 
-    doctorsContainer.appendChild(doctorElement);
+      doctorsContainer.appendChild(doctorElement);
+    }
   });
 }
 
-async function fetchAndRenderDoctors() {
+async function fetchAndRenderDoctors(searchQuery = "") {
   try {
     const response = await fetch("/api/doctors");
     const doctors = await response.json();
-    renderDoctors(doctors);
+    renderDoctors(doctors, searchQuery);
   } catch (error) {
     console.error("Error fetching doctors:", error);
   }
@@ -48,7 +72,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   menuItems.forEach((menuItem) => {
     const page = menuItem.getAttribute("data-page");
 
-    // Only add click event listener for links that should load dynamically
     if (page !== "logout") {
       menuItem.addEventListener("click", async (event) => {
         event.preventDefault();
@@ -83,16 +106,54 @@ function setActiveLink(page) {
   });
 }
 
+document.addEventListener("click", (event) => {
+  const sidebar = document.querySelector(".sidebar");
+  const menuToggle = document.querySelector(".menu-toggle");
+
+  if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+    if (sidebar.classList.contains("is-active")) {
+      sidebar.classList.remove("is-active");
+
+      menuToggle.classList.remove("is-active", "hamburger-active");
+    }
+  }
+});
+
 async function loadPage(page) {
   try {
     const response = await fetch(`/patient/${page}`);
     const pageContent = await response.text();
+
+    const sidebar = document.querySelector(".sidebar");
+    sidebar.classList.remove("is-active");
+    menuToggle.classList.remove("is-active");
+
     document.querySelector(".main-content").innerHTML = pageContent;
 
     setActiveLink(page);
 
+
+    if (page === "appointments") {
+
     if (page === "home") {
+
       await fetchAndRenderDoctors();
+
+      const searchInput = document.getElementById("searchInput");
+      if (searchInput) {
+        searchInput.addEventListener("input", () => {
+          const searchQuery = searchInput.value.trim();
+          fetchAndRenderDoctors(searchQuery);
+        });
+
+        const clearSearchIcon = document.getElementById("clearSearch");
+        if (clearSearchIcon) {
+          clearSearchIcon.addEventListener("click", () => {
+            searchInput.value = "";
+            fetchAndRenderDoctors();
+          });
+        }
+      }
     }
   } catch (error) {
     console.error("Error loading page:", error);
