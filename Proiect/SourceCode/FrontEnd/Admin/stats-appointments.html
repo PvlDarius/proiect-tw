@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistici Programări</title>
+  <link rel="stylesheet" href="admin-home.css">
+  <style>
+    table {
+      width: 80%;
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 15px; 
+      text-align: center;
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Statistici Programări</h1>
+  <a href="admin-home.ejs">Înapoi la Pagina Principală</a>
+  <br>
+  <div id="appointmentStats">
+    <table>
+      <tr>
+        <th>Specializare</th>
+        <th>Ultima Lună</th>
+        <th>Ultimul An</th>
+        <th>Doctor</th>
+      </tr>
+      <tr>
+        <td>Alergologie și Imunologie</td>
+        <td><span id="alergologieLastMonth">5</span></td>
+        <td><span id="alergologieLastYear">40</span></td>
+        <td>Dr. Popescu</td>
+      </tr>
+      <tr>
+        <td>Boli Infectiosase</td>
+        <td><span id="boliInfectioaseLastMonth">15</span></td>
+        <td><span id="boliInfectioaseLastYear">150</span></td>
+        <td>Dr. Grosan</td>
+      </tr>
+      <tr>
+        <td>Cardiologie</td>
+        <td><span id="cardiologieLastMonth">8</span></td>
+        <td><span id="cardiologieLastYear">75</span></td>
+        <td>Dr. Rosu</td>
+      </tr>
+      <tr>
+        <td>Chirurgie Generala</td>
+        <td><span id="chirurgieGeneralaLastMonth">15</span></td>
+        <td><span id="chirurgieGeneralaLastYear">150</span></td>
+        <td>Dr. Dragu</td>
+      </tr>
+      <tr>
+        <td>Diabet zaharat, nutritie si boli metabolice</td>
+        <td><span id="diabetLastMonth">3</span></td>
+        <td><span id="diabetLastYear">70</span></td>
+        <td>Dr. Mares</td>
+      </tr>
+      <tr>
+        <td>Endocrinologie</td>
+        <td><span id="endocrinologieLastMonth">4</span></td>
+        <td><span id="endocrinologieLastYear">60</span></td>
+        <td>Dr. Pop</td>
+      </tr>
+      <tr>
+        <td>Gastroenterologie</td>
+        <td><span id="gastroenterologieLastMonth">7</span></td>
+        <td><span id="gastroenterologieLastYear">35</span></td>
+        <td>Dr. Hainal</td>
+      </tr>
+      <tr>
+        <td>Neurologie</td>
+        <td><span id="neurologieLastMonth">3</span></td>
+        <td><span id="neurologieLastYear">15</span></td>
+        <td>Dr. Rites</td>
+      </tr>
+      <tr>
+        <td>Psihiatrie</td>
+        <td><span id="psihiatrieLastMonth">8</span></td>
+        <td><span id="psihiatrieLastYear">75</span></td>
+        <td>Dr. Blaga</td>
+      </tr>
+ <br>
+ <br>
+    </table>
+  </div>
+</div>
+
+<script src="admin-home.js"></script>
+</body>
+</html>
