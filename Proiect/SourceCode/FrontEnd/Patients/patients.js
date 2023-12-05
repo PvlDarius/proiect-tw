@@ -132,7 +132,11 @@ async function loadPage(page) {
 
     setActiveLink(page);
 
+
     if (page === "appointments") {
+
+    if (page === "home") {
+
       await fetchAndRenderDoctors();
 
       const searchInput = document.getElementById("searchInput");

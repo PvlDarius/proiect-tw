@@ -1,0 +1,67 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: rgb(245, 245, 245); 
+  text-align: center;
+}
+
+a {
+  background-color: #3471B8;
+  color: #ffffff; /* Text alb */
+  text-decoration: none; /* Pentru a elimina sublinierea implicită a link-urilor */
+  padding: 15px; /* Mai mult spațiu în jurul textului */
+  margin-bottom: 10px; /* Spațiu între link-uri */
+  display: block; /* Face link-urile să fie afișate ca blocuri separate */
+  border-radius: 8px; /* Colțuri rotunjite */
+}
+
+/* Stil pentru link atunci când este hover (cursorul este deasupra) */
+a:hover {
+  background-color: #265181; /* Poți schimba culoarea la hover, dacă dorești */
+  /* Alte stiluri suplimentare la hover, dacă este cazul */
+}
+
+.container {
+  margin: 50px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  max-width: 300px;
+  margin: 0 auto;
+  border: 1px solid #428ce0;
+  border-radius: 10px;
+  padding: 15px;
+  background-color: #428ce0;
+}
+
+.form-title {
+  color: #000000;
+}
+
+label {
+  margin-top: 10px;
+  color: #fff;
+}
+
+input {
+  padding: 8px;
+  margin-top: 5px;
+}
+
+button {
+  background: #3471B8;
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px; 
+  display: block; 
+  margin: 10px auto; 
+}
+
+button:hover {
+  background-color: #6495ED;
+}

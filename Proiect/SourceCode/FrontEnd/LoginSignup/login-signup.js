@@ -1,8 +1,6 @@
 function validateLogin() {
-  // Reset validation message
   document.getElementById("validation-message").innerHTML = "";
 
-  // Your login validation logic
   if (document.formFill.email.value == "") {
     document.getElementById("validation-message").innerHTML =
       "Please enter your email!";
@@ -13,17 +11,14 @@ function validateLogin() {
     return false;
   }
 
-  // Submit the login form if validation is successful
   document.getElementById("loginForm").submit();
 
   return false;
 }
 
 function validateSignup() {
-  // Reset validation message
   document.getElementById("validation-message").innerHTML = "";
 
-  // Your signup validation logic
   if (document.formFill.first_name.value == "") {
     document.getElementById("validation-message").innerHTML =
       "Please enter your first name!";
@@ -56,14 +51,12 @@ function validateSignup() {
     return false;
   }
 
-  // Submit the signup form if validation is successful
   document.getElementById("signupForm").submit();
 
   return false;
 }
 
 function submitForm(formData, formType) {
-  // Send form data to server using Fetch API
   fetch(`/auth/${formType}`, {
     method: "POST",
     headers: {
@@ -78,18 +71,14 @@ function submitForm(formData, formType) {
       return response.json();
     })
     .then((data) => {
-      // Handle the response from the server
       if (data.error) {
-        // Handle error
         document.getElementById("validation-message").innerHTML = data.error;
       } else if (data.success) {
-        // Handle success
         document.getElementById("success-message").innerHTML = data.success;
       }
     })
     .catch((error) => {
       console.error("Error:", error);
-      // Handle specific error for login form
       if (formType === "login") {
         document.getElementById("validation-message").innerHTML =
           "Invalid credentials";
@@ -97,13 +86,10 @@ function submitForm(formData, formType) {
     });
 }
 
-// Other functions...
 
 function validateAndSubmitLogin() {
-  // Call the login validation function
   const isValidationPassed = validateLogin();
 
-  // Call the submitForm function only if validation passed
   if (isValidationPassed) {
     const formData = {
       email: document.formFill.email.value,
@@ -111,16 +97,12 @@ function validateAndSubmitLogin() {
     };
     submitForm(formData, "login");
   } else {
-    // If validation fails, prevent the form submission
     return false;
   }
 }
 
 function validateAndSubmitSignup() {
-  // Call the signup validation function
   const isValidationPassed = validateSignup();
-
-  // Call the submitForm function only if validation passed
   if (isValidationPassed) {
     const formData = {
       first_name: document.formFill.first_name.value,
@@ -131,7 +113,6 @@ function validateAndSubmitSignup() {
     };
     submitForm(formData, "signup");
   } else {
-    // If validation fails, prevent the form submission
     return false;
   }
 }

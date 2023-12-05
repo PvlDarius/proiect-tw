@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Doctor Account</title>
+  <link rel="stylesheet" href="admin-home.css">
+  <link rel="stylesheet" href="create-doctor-account.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Create Doctor Account</h1>
+    <a href="admin-home.ejs">Back to Home</a>
+    <div id="createAccountForm">
+      <label for="doctorName">Name:</label>
+      <input type="text" id="doctorName" required>
+
+      <label for="specialization">Specialization:</label>
+      <input type="text" id="specialization" required>
+
+      <button onclick="createAccount()">Create Doctor Account</button>
+    </div>
+  </div>
+
+  <script src="admin-home.js"></script>
+</body>
+</html>
+
