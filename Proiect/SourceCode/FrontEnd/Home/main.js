@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  
   function scrollToSection(sectionId) {
     const section = document.getElementById(sectionId);
     if (section) {
@@ -46,7 +45,7 @@ async function fetchDoctors() {
     return doctors;
   } catch (error) {
     console.error("Error fetching doctors:", error.message);
-    return []; 
+    return [];
   }
 }
 
@@ -132,14 +131,19 @@ async function updateStatistics() {
 document.addEventListener("DOMContentLoaded", updateStatistics);
 
 let header = document.querySelector(".header");
-// let serviceBox = document.querySelector(".services .box-container .box");
-// let doctorBox = document.querySelector(".doctors .box-container .box");
+let serviceBoxes = document.querySelectorAll(".services .box-container .box");
 
-let isDarkMode = false; // Variable to track the current mode
+let isDarkMode = JSON.parse(localStorage.getItem("darkMode")) || false;
+
+applyDarkMode();
 
 function toggleDarkMode() {
-  isDarkMode = !isDarkMode; // Toggle the mode
+  isDarkMode = !isDarkMode;
+  applyDarkMode();
+  localStorage.setItem("darkMode", JSON.stringify(isDarkMode));
+}
 
+function applyDarkMode() {
   document.body.classList.toggle("dark-mode", isDarkMode);
 
   const modeIcon = document.getElementById("modeIcon");
@@ -147,14 +151,10 @@ function toggleDarkMode() {
   modeIcon.classList.toggle("fa-sun", isDarkMode);
 
   header.classList.toggle("dark-mode", isDarkMode);
-  // serviceBox.classList.toggle("dark-mode", isDarkMode);
-  // doctorBox.classList.toggle("dark-mode", isDarkMode);
 
-  localStorage.setItem("darkMode", isDarkMode);
+  serviceBoxes.forEach((box) => {
+    box.classList.toggle("dark-mode", isDarkMode);
+  });
 }
 
-const storedDarkMode = localStorage.getItem("darkMode");
-if (storedDarkMode) {
-  isDarkMode = JSON.parse(storedDarkMode);
-  toggleDarkMode();
-}
+applyDarkMode();

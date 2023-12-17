@@ -42,12 +42,14 @@ html{
 
 .dark-mode section:nth-child(even),
 .dark-mode #menu-btn,
-.dark-mode .footer .credit{
+.dark-mode .footer .credit,
+.dark-mode .icons-container .icons{
     background: var(--midnight);
 }
 
 .dark-mode .header,
-.dark-mode .box-container .box{
+.dark-mode .services .box-container .box,
+.dark-mode .doctors .box-container .box{
     background: var(--eerie-black);
 }
 
@@ -63,7 +65,9 @@ html{
 .dark-mode .footer .box-container .box h3,
 .dark-mode .header .navbar a,
 .dark-mode .header .logo,
-.dark-mode .header .logo i{
+.dark-mode .header .logo i,
+.dark-mode .services .box-container .box h3,
+.dark-mode .doctors .box-container .box h3{
     color: var(--white);
 }
 
