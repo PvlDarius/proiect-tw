@@ -8,13 +8,15 @@ router.get("/", (req, res) => {
 });
 
 router.get("/login", (req, res) => {
-  res.render("login", {
+  res.render("login-signup-frame", {
+    body: "login",
     message: "",
   });
 });
 
 router.get("/signup", (req, res) => {
-  res.render("signup", {
+  res.render("login-signup-frame", {
+    body: "signup",
     message: "",
   });
 });

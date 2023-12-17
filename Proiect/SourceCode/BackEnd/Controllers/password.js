@@ -39,9 +39,9 @@ exports.forgotPassword = async (req, res) => {
     ]);
 
     if (!result.length) {
-      return res.render("forgot-password", {
-        message: "No user found with that email address",
-      });
+      return res.redirect(
+        "/auth/forgot-password?errorMessage=No user found with this email"
+      );
     }
 
     const resetToken = generateToken();
@@ -64,29 +64,31 @@ exports.forgotPassword = async (req, res) => {
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error(error);
-        return res.status(500).json({ message: "Failed to send email" });
+        return res.redirect(
+          "/auth/forgot-password?errorMessage=Failed to send email"
+        );
       }
 
-      console.log("Email sent: " + info.response);
-      res.render("forgot-password", {
-        message: "Password reset email sent. Check your inbox.",
-      });
+      return res.redirect(
+        "/auth/forgot-password?successMessage=Email sent! Check your inbox"
+      );
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    return res.redirect(
+      "/auth/forgot-password?errorMessage=Internal server error"
+    );
   }
 };
 
 exports.resetPassword = async (req, res) => {
   try {
-    const token = req.body.token; // Extract token from the request body
-    console.log("Attempting to reset password for token:", token);
+    const token = req.body.token;
 
     if (!token) {
-      return res.render("reset-password", {
-        message: "Invalid or expired reset token",
-      });
+      return res.redirect(
+        `/auth/reset-password?errorMessage=Invalid or expired reset token.&token=${token}`
+      );
     }
 
     const [result] = await pool.execute(
@@ -95,12 +97,21 @@ exports.resetPassword = async (req, res) => {
     );
 
     if (!result.length) {
-      return res.render("reset-password", {
-        message: "Invalid or expired reset token",
-      });
+      return res.redirect(
+        `/auth/reset-password?errorMessage=Invalid or expired reset token.&token=${token}`
+      );
     }
 
     const password = req.body.password;
+    const confirmPassword = req.body.confirmPassword;
+
+    if (password !== confirmPassword) {
+      return res.redirect(
+        `/auth/reset-password?errorMessage=Passwords do not match.&token=${token}`
+      );
+    }
+
+    // Update password only if the token is valid
     const hashedPassword = await bcrypt.hash(password, 8);
 
     await pool.execute(
@@ -108,12 +119,13 @@ exports.resetPassword = async (req, res) => {
       [hashedPassword, token]
     );
 
-    return res.render("reset-password", {
-      message:
-        "Password reset successful. You can now log in with your new password.",
-    });
+    return res.redirect(
+      "/auth/reset-password?successMessage=Password reset successful. \nYou can now log in."
+    );
   } catch (error) {
     console.error("Error resetting password:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.redirect(
+      "/auth/reset-password?errorMessage=Internal server error"
+    );
   }
 };

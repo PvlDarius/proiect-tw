@@ -132,26 +132,24 @@ async function loadPage(page) {
 
     setActiveLink(page);
 
-
     if (page === "appointments") {
+      if (page === "home") {
+        await fetchAndRenderDoctors();
 
-    if (page === "home") {
-
-      await fetchAndRenderDoctors();
-
-      const searchInput = document.getElementById("searchInput");
-      if (searchInput) {
-        searchInput.addEventListener("input", () => {
-          const searchQuery = searchInput.value.trim();
-          fetchAndRenderDoctors(searchQuery);
-        });
-
-        const clearSearchIcon = document.getElementById("clearSearch");
-        if (clearSearchIcon) {
-          clearSearchIcon.addEventListener("click", () => {
-            searchInput.value = "";
-            fetchAndRenderDoctors();
+        const searchInput = document.getElementById("searchInput");
+        if (searchInput) {
+          searchInput.addEventListener("input", () => {
+            const searchQuery = searchInput.value.trim();
+            fetchAndRenderDoctors(searchQuery);
           });
+
+          const clearSearchIcon = document.getElementById("clearSearch");
+          if (clearSearchIcon) {
+            clearSearchIcon.addEventListener("click", () => {
+              searchInput.value = "";
+              fetchAndRenderDoctors();
+            });
+          }
         }
       }
     }

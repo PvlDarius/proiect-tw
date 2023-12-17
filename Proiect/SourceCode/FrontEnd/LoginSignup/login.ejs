@@ -1,62 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="./login-signup.css"
+<form
+  action="/auth/login"
+  method="POST"
+  name="formFill"
+  onsubmit="return validateAndSubmitLogin()"
+  id="loginForm"
+>
+  <%- include('navbar') %>
+  <h2>Log In</h2>
+  <p id="validation-message" class="validation-message"></p>
+  <div class="input-box">
+    <i class="fa-solid fa-envelope"></i>
+    <input type="email" id="email" name="email" placeholder="Email" />
+    <label id="email-validation"></label>
+  </div>
+  <div class="input-box">
+    <i class="fa-solid fa-lock"></i>
+    <input
+      type="password"
+      id="password"
+      name="password"
+      placeholder="Password"
     />
-    <script
-      src="https://kit.fontawesome.com/88f38507d4.js"
-      crossorigin="anonymous"
-    ></script>
-    <title>Log In</title>
-  </head>
-  <body>
-    <div class="container">
-      <div class="form-container">
-        <form
-          action="/auth/login"
-          method="POST"
-          name="formFill"
-          onsubmit="return validateAndSubmitLogin()"
-          id="loginForm"
-        >
-          <h2>Log In</h2>
-          <p id="validation-message" class="validation-message"></p>
-          <div class="input-box">
-            <i class="fa-solid fa-envelope"></i>
-            <input type="email" id="email" name="email" placeholder="Email" />
-            <label id="email-validation"></label>
-          </div>
-          <div class="input-box">
-            <i class="fa-solid fa-lock"></i>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Password"
-            />
-            <label id="password-validation"></label>
-          </div>
-          <div class="submit-button">
-            <input class="button" type="submit" />
-          </div>
-          <div class="group">
-            <span>Don't have an account? <a href="/signup">Sign Up</a></span>
-          </div>
-          <a class="forgot-password-link" href="/auth/forgot-password"
-            >Forgot Password?</a
-          >
-          <br /><br /><br />
-          <div class="back-home">
-            <a class="back-button" href="/">Back to Home</a>
-          </div>
-        </form>
-      </div>
-    </div>
-    <script defer src="LoginSignup/login-signup.js"></script>
-  </body>
-</html>
+    <label id="password-validation"></label>
+  </div>
+  <div class="submit-button">
+    <input class="button" type="submit" />
+  </div>
+</form>
