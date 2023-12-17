@@ -111,6 +111,10 @@ app.get("/auth/reset-password", (req, res) => {
   res.render("reset-password", { token, message: "" });
 });
 
+app.get("/join", (req, res) => {
+  res.render("login-signup-frame"); // Assuming 'auth-frame' is the name of your EJS file
+});
+
 app.use(checkUserRole);
 app.use(authMiddleware);
 

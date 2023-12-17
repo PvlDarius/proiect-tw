@@ -10,9 +10,10 @@
 }
 
 body{
-    background: url(./Public/Images/health-app.png) no-repeat;
+    background: url(../Images/icegif-943.gif) no-repeat;
     background-position: center;
     background-size: cover;
+    background-position: left;
     min-height: 100vh;
     width: 100%;
 }
@@ -24,13 +25,43 @@ body{
     min-height: 100vh;
 }
 
+.navbar{
+    top: 2rem;
+    position: fixed;
+}
+
+.navbar .logo{
+    color: #fafafa;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    margin-left: 4.6rem;
+}
+
+.navbar .logo i{
+    position: relative;
+}
+
+.navbar a{
+    color: #fafafa;
+    transition: 0.3s ease;
+    margin-right: 0.7rem;
+}
+
+.navbar a:hover{
+    color: #214976;
+}
+
+.navbar a.is-active{
+    color: #214976;
+}
+
 .form-container{
     position: relative;
     width: 400px;
     height: 600px;
     border: 2px solid rgba(255,255,2550.5);
     border-radius: 20px;
-    background: rgba(52, 113, 183, 0.2);
+    background: rgba(52, 113, 183, 0.6);
     backdrop-filter: blur(15px);
     display: flex;
     justify-content: center;
@@ -64,7 +95,7 @@ input::placeholder{
     color: #fafafa;
 }
 
-i{
+.form-container .input-box i{
     position: absolute;
     color: #fafafa;
     right: 0;
@@ -113,7 +144,7 @@ i{
 }
 
 #success-message{
-    color: lime;
+    color: green;
     font-weight: 600;
     position: relative;
     top: 25px;

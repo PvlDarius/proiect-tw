@@ -56,6 +56,73 @@ function validateSignup() {
   return false;
 }
 
+function validateForgotPassword() {
+  document.getElementById("email-validation").innerHTML = "";
+
+  if (document.formFill.email.value == "") {
+    document.getElementById("validation-message").innerHTML =
+      "Please enter your email!";
+    return false;
+  }
+
+  document.getElementById("forgotForm").submit();
+
+  return false;
+}
+
+function validateResetPassword() {
+  document.getElementById("password-validation").innerHTML = "";
+
+  if (document.formFill.password.value == "") {
+    document.getElementById("validation-message").innerHTML =
+      "Please enter a password!";
+    return false;
+  } else if (document.formFill.password.value.length < 6) {
+    document.getElementById("validation-message").innerHTML =
+      "Password must be at least 6 characters long!";
+    return false;
+  } else if (
+    document.formFill.password.value !== document.formFill.confirmPassword.value
+  ) {
+    document.getElementById("validation-message").innerHTML =
+      "The entered passwords do not match!";
+    return false;
+  }
+
+  document.getElementById("resetForm").submit();
+
+  return false;
+}
+
+function validateAndSubmitForgot() {
+  const isValidationPassed = validateForgotPassword();
+
+  if (isValidationPassed) {
+    const formData = {
+      email: document.formFill.email.value,
+    };
+    submitForm(formData, "forgot-password");
+  } else {
+    return false;
+  }
+}
+
+function validateAndSubmitReset() {
+  const isValidationPassed = validateResetPassword();
+
+  if (isValidationPassed) {
+    const formData = {
+      password: document.formFill.password.value,
+      token: document.formFill.token
+        ? document.formFill.token.value
+        : undefined,
+    };
+    submitForm(formData, "reset-password");
+  } else {
+    return false;
+  }
+}
+
 function submitForm(formData, formType) {
   fetch(`/auth/${formType}`, {
     method: "POST",
@@ -85,7 +152,6 @@ function submitForm(formData, formType) {
       }
     });
 }
-
 
 function validateAndSubmitLogin() {
   const isValidationPassed = validateLogin();
@@ -132,3 +198,14 @@ if (errorMessage) {
 if (successMessage) {
   document.getElementById("success-message").innerText = successMessage;
 }
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const authLinks = document.querySelectorAll(".menu-item[data-page^='auth/']");
+  authLinks.forEach((authLink) => {
+    const page = authLink.getAttribute("data-page").replace("auth/", "");
+    authLink.addEventListener("click", async (event) => {
+      event.preventDefault();
+      loadAuthPage(page);
+    });
+  });
+});

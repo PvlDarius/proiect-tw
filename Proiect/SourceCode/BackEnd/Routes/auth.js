@@ -9,16 +9,18 @@ router.post("/forgot-password", authController.forgotPassword);
 router.post("/reset-password", authController.resetPassword);
 
 router.get("/forgot-password", (req, res) => {
-  res.render("forgot-password", {
+  res.render("login-signup-frame", {
+    body: "forgot-password",
     message: "",
   });
 });
 
 router.get("/reset-password", (req, res) => {
-  const token = req.query.token; // Use req.query to get the token from query parameters
-  console.log("Reset Password Token:", token); // Debugging
-  res.render("reset-password", {
-    token,
+  const token = req.query.token;
+  res.render("login-signup-frame", {
+    body: "reset-password",
+    layout: false,
+    token: token,
     message: "",
   });
 });

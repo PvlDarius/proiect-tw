@@ -4,7 +4,6 @@ function authMiddleware(req, res, next) {
   const token = req.cookies.jwt;
 
   if (!token) {
-    console.log("No token found");
     if (
       !req.originalUrl.startsWith("/login") &&
       !req.originalUrl.startsWith("/auth/reset-password")
@@ -15,7 +14,6 @@ function authMiddleware(req, res, next) {
     try {
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Ensure that decodedToken contains user role
       if (decodedToken.userRole) {
         req.user = decodedToken;
         return next();

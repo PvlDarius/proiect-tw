@@ -1,88 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="LoginSignup/login-signup.css"
+<form
+  action="/auth/signup"
+  method="POST"
+  name="formFill"
+  onsubmit="return validateAndSubmitSignup()"
+  id="signupForm"
+>
+  <%- include('navbar') %>
+  <br /><br />
+  <h2>Sign Up</h2>
+  <p id="validation-message" class="validation-message"></p>
+  <p id="success-message" class="success-message"></p>
+  <div class="input-box">
+    <i class="fa-solid fa-user"></i>
+    <input
+      type="text"
+      id="first_name"
+      name="first_name"
+      placeholder="First Name"
     />
-    <script
-      src="https://kit.fontawesome.com/88f38507d4.js"
-      crossorigin="anonymous"
-    ></script>
-    <title>Sign Up</title>
-  </head>
-  <body>
-    <div class="container">
-      <div class="form-container">
-        <form
-          action="/auth/signup"
-          method="POST"
-          name="formFill"
-          onsubmit="return validateAndSubmitSignup()"
-          id="signupForm"
-        >
-          <h2>Sign Up</h2>
-          <p id="validation-message" class="validation-message"></p>
-          <p id="success-message" class="success-message"></p>
-          <div class="input-box">
-            <i class="fa-solid fa-user"></i>
-            <input
-              type="text"
-              id="first_name"
-              name="first_name"
-              placeholder="First Name"
-            />
-            <label id="first_name-validation"></label>
-          </div>
-          <div class="input-box">
-            <i class="fa-solid fa-users"></i>
-            <input
-              type="text"
-              id="last_name"
-              name="last_name"
-              placeholder="Last Name"
-            />
-            <label id="last_name-validation"></label>
-          </div>
-          <div class="input-box">
-            <i class="fa-solid fa-envelope"></i>
-            <input type="email" id="email" name="email" placeholder="Email" />
-            <label id="email-validation"></label>
-          </div>
-          <div class="input-box">
-            <i class="fa-solid fa-lock"></i>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              placeholder="Password"
-            />
-            <label id="password-validation"></label>
-          </div>
-          <div class="input-box">
-            <i class="fa-solid fa-lock"></i>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              placeholder="Confirm Password"
-            />
-            <label id="confirmPassword-validation"></label>
-          </div>
-          <div class="submit-button">
-            <input class="button" type="submit" />
-          </div>
-          <div class="group">
-            <span>Already have an account? <a href="/login">Log In</a></span>
-          </div>
-          <br /><br /><br />
-          <a class="button" href="/">Back to Home</a>
-        </form>
-      </div>
-    </div>
-    <script src="LoginSignup/login-signup.js"></script>
-  </body>
-</html>
+    <label id="first_name-validation"></label>
+  </div>
+  <div class="input-box">
+    <i class="fa-solid fa-users"></i>
+    <input
+      type="text"
+      id="last_name"
+      name="last_name"
+      placeholder="Last Name"
+    />
+    <label id="last_name-validation"></label>
+  </div>
+  <div class="input-box">
+    <i class="fa-solid fa-envelope"></i>
+    <input type="email" id="email" name="email" placeholder="Email" />
+    <label id="email-validation"></label>
+  </div>
+  <div class="input-box">
+    <i class="fa-solid fa-lock"></i>
+    <input
+      type="password"
+      id="password"
+      name="password"
+      placeholder="Password"
+    />
+    <label id="password-validation"></label>
+  </div>
+  <div class="input-box">
+    <i class="fa-solid fa-lock"></i>
+    <input
+      type="password"
+      id="confirmPassword"
+      name="confirmPassword"
+      placeholder="Confirm Password"
+    />
+    <label id="confirmPassword-validation"></label>
+  </div>
+  <div class="submit-button">
+    <input class="button" type="submit" />
+  </div>
+</form>
