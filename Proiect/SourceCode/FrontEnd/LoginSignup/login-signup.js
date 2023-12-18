@@ -183,6 +183,20 @@ function validateAndSubmitSignup() {
   }
 }
 
+function togglePasswordVisibility(inputId, toggleTextId) {
+  const passwordInput = document.getElementById(inputId);
+  const toggleText = document.getElementById(toggleTextId);
+
+  // Toggle the 'type' attribute between 'password' and 'text'
+  if (passwordInput.type === "password") {
+    passwordInput.type = "text";
+    toggleText.innerText = "Hide Password";
+  } else {
+    passwordInput.type = "password";
+    toggleText.innerText = "Show Password";
+  }
+}
+
 function getQueryParam(name) {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get(name);
