@@ -1,3 +1,32 @@
 <main class="main-content">
   <h1>Settings</h1>
+
+  <section class="settings-category" id="profile-settings">
+    <h2>Profile Settings</h2>
+
+    <!-- Display current profile picture -->
+    <div class="profile-picture-container">
+      <img
+        src=""
+        alt="current-profile-picture"
+        class="current-profile-picture"
+        id="currentProfilePicture"
+      />
+    </div>
+
+    <input
+      type="file"
+      id="profilePictureInput"
+      accept=".png, .jpg, .jpeg"
+      onchange="displaySelectedPicture(this)"
+    />
+    <button onclick="saveProfilePicture()">Save Profile Picture</button>
+  </section>
+
+  <section class="settings-category" id="notification-settings">
+    <h2>Notification Settings</h2>
+    <!-- Add notification settings content here -->
+  </section>
+
+  <!-- Add more sections for additional settings categories -->
 </main>

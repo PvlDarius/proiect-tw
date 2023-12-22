@@ -37,28 +37,26 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user.id, userRole: user.user_role },
+      { userId: user.user_id, userRole: user.user_role },
       process.env.JWT_SECRET,
       { expiresIn: "8h" }
     );
 
     const isProduction = process.env.NODE_ENV === "production" || false;
 
+    // Set the token as a cookie
     res.cookie("jwt", token, {
       httpOnly: true,
-      secure: isProduction,
+      secure: isProduction, // Set to true in production
       sameSite: "Strict",
     });
 
-    req.user = user;
-
-    // Redirect based on user role
     if (user.user_role === "admin") {
-      return res.redirect("/admin/home");
+      return res.redirect(`/admin/home?token=${token}`);
     } else if (user.user_role === "doctor") {
-      return res.redirect("/doctor/home");
+      return res.redirect(`/doctor/home?token=${token}`);
     } else {
-      return res.redirect("/patient/");
+      return res.redirect(`/patient/?token=${token}`);
     }
   } catch (error) {
     console.error(error);

@@ -9,18 +9,6 @@ menuToggle.addEventListener("click", () => {
 const imageFolderPath = "../Images/";
 
 function renderDoctors(doctors, searchQuery = "") {
-  const activePage = document
-    .querySelector(".menu-item.active")
-    .getAttribute("data-page");
-
-  if (activePage !== "appointments") {
-    return;
-  }
-
-  doctors.sort((a, b) =>
-    a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
-  );
-
   const doctorsContainer = document.querySelector(".doctors-container");
 
   if (!doctorsContainer) {
@@ -58,11 +46,19 @@ function renderDoctors(doctors, searchQuery = "") {
 
 async function fetchAndRenderDoctors(searchQuery = "") {
   try {
+    const activePage = document
+      .querySelector(".menu-item.active")
+      .getAttribute("data-page");
+
+    if (activePage !== "appointments") {
+      return;
+    }
+
     const response = await fetch("/api/doctors");
     const doctors = await response.json();
     renderDoctors(doctors, searchQuery);
   } catch (error) {
-    console.error("Error fetching doctors:", error);
+    console.error("Error fetching and rendering doctors:", error);
   }
 }
 
@@ -83,6 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const currentPath = window.location.pathname.split("/").pop();
   const defaultPage = currentPath || "home";
   setActiveLink(defaultPage);
+  fetchUserInfo(defaultPage);
 
   loadPage(defaultPage);
 });
@@ -132,28 +129,133 @@ async function loadPage(page) {
 
     setActiveLink(page);
 
+    fetchUserInfo(page);
+
     if (page === "appointments") {
-      if (page === "home") {
-        await fetchAndRenderDoctors();
+      await fetchAndRenderDoctors();
 
-        const searchInput = document.getElementById("searchInput");
-        if (searchInput) {
-          searchInput.addEventListener("input", () => {
-            const searchQuery = searchInput.value.trim();
-            fetchAndRenderDoctors(searchQuery);
+      const searchInput = document.getElementById("searchInput");
+      if (searchInput) {
+        searchInput.addEventListener("input", () => {
+          const searchQuery = searchInput.value.trim();
+          fetchAndRenderDoctors(searchQuery);
+        });
+
+        const clearSearchIcon = document.getElementById("clearSearch");
+        if (clearSearchIcon) {
+          clearSearchIcon.addEventListener("click", () => {
+            searchInput.value = "";
+            fetchAndRenderDoctors();
           });
-
-          const clearSearchIcon = document.getElementById("clearSearch");
-          if (clearSearchIcon) {
-            clearSearchIcon.addEventListener("click", () => {
-              searchInput.value = "";
-              fetchAndRenderDoctors();
-            });
-          }
         }
       }
     }
   } catch (error) {
     console.error("Error loading page:", error);
+  }
+}
+
+async function fetchUserInfo(page) {
+  try {
+    const response = await fetch("/auth/user-info");
+    const userInfo = await response.json();
+
+    const userImageElement = document.querySelector(".user-img");
+    const imagePath = `/UserImages/${userInfo.userImage}`;
+    userImageElement.src = imagePath;
+
+    if (page === "settings") {
+      const currentProfilePicture = document.getElementById(
+        "currentProfilePicture"
+      );
+      if (currentProfilePicture) {
+        currentProfilePicture.src = imagePath;
+      }
+    }
+
+    const userNameElement = document.getElementById("user-name");
+    userNameElement.textContent = `${userInfo.firstName} ${userInfo.lastName}`;
+
+    // Update user role
+    const userRoleElement = document.getElementById("user-role");
+    userRoleElement.textContent =
+      userInfo.userRole.charAt(0).toUpperCase() + userInfo.userRole.slice(1);
+  } catch (error) {
+    console.error("Error fetching user information:", error);
+  }
+}
+
+function displaySelectedPicture(input) {
+  const currentProfilePicture = document.getElementById(
+    "currentProfilePicture"
+  );
+  const file = input.files[0];
+
+  if (file) {
+    const allowedTypes = ["image/png", "image/jpeg"];
+    if (allowedTypes.includes(file.type)) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        currentProfilePicture.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      alert("Please select a valid image file (PNG or JPEG).");
+      input.value = "";
+      currentProfilePicture.src = "";
+    }
+  }
+}
+
+function getTokenFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get("token");
+}
+
+function removeTokenFromUrl() {
+  const url = new URL(window.location.href);
+  url.searchParams.delete("token");
+  window.history.replaceState({}, document.title, url.href);
+}
+
+const tokenFromUrl = getTokenFromUrl();
+
+if (tokenFromUrl) {
+  sessionStorage.setItem("jwt", tokenFromUrl);
+
+  removeTokenFromUrl();
+}
+
+function saveProfilePicture() {
+  const fileInput = document.getElementById("profilePictureInput");
+  const file = fileInput.files[0];
+
+  if (file) {
+    const formData = new FormData();
+    formData.append("profilePicture", file);
+
+    const token = sessionStorage.getItem("jwt");
+
+    if (token) {
+      fetch("/auth/upload-profile-picture", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Profile picture uploaded:", data);
+          loadPage("settings");
+        })
+        .catch((error) =>
+          console.error("Error uploading profile picture:", error)
+        );
+    } else {
+      console.warn("Token is null in sessionStorage.");
+    }
+  } else {
+    console.warn("No file selected.");
   }
 }
