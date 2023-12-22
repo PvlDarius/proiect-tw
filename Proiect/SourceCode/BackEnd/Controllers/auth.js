@@ -40,6 +40,7 @@ exports.getUserInfo = async (req, res) => {
       const userInfo = {
         firstName: user.first_name,
         lastName: user.last_name,
+        email: user.email,
         userRole: user.user_role,
         userImage: user.user_image,
         // Add other necessary user properties here

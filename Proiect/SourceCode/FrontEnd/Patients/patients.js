@@ -171,6 +171,13 @@ async function fetchUserInfo(page) {
       if (currentProfilePicture) {
         currentProfilePicture.src = imagePath;
       }
+      const firstName = document.getElementById("firstNameInput");
+      const lastName = document.getElementById("lastNameInput");
+      const email = document.getElementById("emailInput");
+
+      firstName.value = `${userInfo.firstName}`;
+      lastName.value = `${userInfo.lastName}`;
+      email.value = `${userInfo.email}`;
     }
 
     const userNameElement = document.getElementById("user-name");
@@ -183,6 +190,127 @@ async function fetchUserInfo(page) {
   } catch (error) {
     console.error("Error fetching user information:", error);
   }
+}
+
+function handleSaveChanges() {
+  const firstNameInput = document.getElementById("firstNameInput");
+  const lastNameInput = document.getElementById("lastNameInput");
+  const emailInput = document.getElementById("emailInput");
+
+  if (firstNameInput.value && lastNameInput.value && emailInput.value) {
+    const token = sessionStorage.getItem("jwt");
+
+    const data = {
+      firstName: firstNameInput.value,
+      lastName: lastNameInput.value,
+      email: emailInput.value,
+    };
+
+    fetch("/auth/update-profile", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        if (data && data.success) {
+          displayPopup("Profile updated successfully", "success");
+          fetchUserInfo("settings");
+        } else {
+          displayPopup("Error updating profile");
+          console.error(
+            "Error updating profile:" + data && data.errors,
+            "error"
+          );
+        }
+      })
+      .catch((error) => {
+        console.error("Error updating profile:", error);
+        displayPopup("Error updating profile. Please try again.", "error");
+      });
+  }
+}
+
+let countdownTimeoutId;
+
+function displayPopup(message, type) {
+  const popup = document.getElementById("popup");
+  const popupHeader = document.getElementById("popupHeader");
+  const popupContent = document.getElementById("popupMessage");
+  const overlay = document.getElementById("overlay");
+  const countdownNumberEl = document.getElementById("countdown-number");
+  const circle = document.querySelector("#countdown circle");
+
+  // Clear the previous countdown timer if it exists
+  if (countdownTimeoutId) {
+    clearTimeout(countdownTimeoutId);
+  }
+
+  // Set the header based on the type parameter
+  popupHeader.textContent =
+    type === "success"
+      ? "Success"
+      : type === "error"
+      ? "Error"
+      : type === "warning"
+      ? "Warning"
+      : "";
+
+  // Set the content of the popup
+  popupContent.textContent = message;
+
+  // Add or remove classes based on the type for styling
+  popup.classList.remove("success-popup", "error-popup", "warning-popup");
+  popup.classList.add(`${type}-popup`, "active");
+
+  overlay.classList.add("active");
+
+  const newCircle = circle.cloneNode(true);
+
+  // Replace the original with the clone
+  circle.parentNode.replaceChild(newCircle, circle);
+
+  // Set the animation property on the new element
+  newCircle.style.animation = "countdown 5s linear forwards";
+
+  startCountdown(5, countdownNumberEl, function () {
+    popup.classList.remove("active");
+    overlay.classList.remove("active");
+  });
+}
+
+function startCountdown(duration, countdownElement, callback) {
+  function updateCountdown() {
+    countdownElement.textContent = duration;
+    if (duration > 0) {
+      duration--;
+      countdownTimeoutId = setTimeout(updateCountdown, 1000);
+    } else {
+      if (callback) {
+        callback();
+      }
+    }
+  }
+
+  updateCountdown();
+}
+
+function togglePopup() {
+  const popup = document.getElementById("popup");
+  const overlay = document.getElementById("overlay");
+
+  // Clear the countdown timer when the popup is manually closed
+  if (countdownTimeoutId) {
+    clearTimeout(countdownTimeoutId);
+  }
+
+  popup.classList.toggle("active");
+  overlay.classList.toggle("active");
 }
 
 function displaySelectedPicture(input) {
@@ -200,7 +328,10 @@ function displaySelectedPicture(input) {
       };
       reader.readAsDataURL(file);
     } else {
-      alert("Please select a valid image file (PNG or JPEG).");
+      displayPopup(
+        "Please select a valid image file (PNG or JPEG).",
+        "warning"
+      );
       input.value = "";
       currentProfilePicture.src = "";
     }
@@ -246,16 +377,16 @@ function saveProfilePicture() {
       })
         .then((response) => response.json())
         .then((data) => {
-          console.log("Profile picture uploaded:", data);
-          loadPage("settings");
+          displayPopup("Profile picture updated successfully!", "success");
+          fetchUserInfo("settings");
         })
         .catch((error) =>
-          console.error("Error uploading profile picture:", error)
+          displayPopup("Error uploading profile picture:" + error, "error")
         );
     } else {
-      console.warn("Token is null in sessionStorage.");
+      displayPopup("Token is null in sessionStorage.", "warning");
     }
   } else {
-    console.warn("No file selected.");
+    displayPopup("Please select a file!", "warning");
   }
 }

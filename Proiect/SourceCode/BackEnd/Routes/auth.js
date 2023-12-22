@@ -4,6 +4,7 @@ const authMiddleware = require("../Middlewares/authMiddleware");
 const path = require("path");
 const multer = require("multer");
 const mysql = require("mysql");
+const { check, validationResult } = require("express-validator");
 
 const db = mysql.createConnection({
   host: process.env.DATABASE_HOST,
@@ -102,6 +103,53 @@ router.post(
         );
       }
     });
+  }
+);
+
+router.post(
+  "/update-profile",
+  [
+    authMiddleware,
+    check("firstName").notEmpty().withMessage("First name is required"),
+    check("lastName").notEmpty().withMessage("Last name is required"),
+    check("email").isEmail().withMessage("Invalid email address"),
+  ],
+  async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const user = req.user;
+      if (!user) {
+        return res.status(401).json({ error: "Unauthorized. User not found." });
+      }
+
+      const { firstName, lastName, email } = req.body;
+
+      const updateQuery =
+        "UPDATE users SET first_name = ?, last_name = ?, email = ? WHERE user_id = ?";
+
+      db.query(
+        updateQuery,
+        [firstName, lastName, email, user.userId],
+        (updateError, updateResults) => {
+          if (updateError) {
+            console.error("Error updating user record:", updateError);
+            res.status(500).json({ error: "Internal server error" });
+          } else {
+            res.json({
+              success: true,
+              message: "Profile updated successfully",
+            });
+          }
+        }
+      );
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
 );
 

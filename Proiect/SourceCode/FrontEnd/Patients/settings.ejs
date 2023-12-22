@@ -5,6 +5,7 @@
     <h2>Profile Settings</h2>
 
     <!-- Display current profile picture -->
+    <h3>Change profile picture</h3>
     <div class="profile-picture-container">
       <img
         src=""
@@ -21,12 +22,59 @@
       onchange="displaySelectedPicture(this)"
     />
     <button onclick="saveProfilePicture()">Save Profile Picture</button>
+
+    <h3>Change user information</h3>
+    <form id="profileForm">
+      <label for="firstNameInput">First Name</label>
+      <input
+        type="text"
+        id="firstNameInput"
+        placeholder=""
+        autocomplete="off"
+      /><br />
+      <label for="lastNameInput">Last Name</label>
+      <input
+        type="text"
+        id="lastNameInput"
+        placeholder=""
+        autocomplete="off"
+      /><br />
+      <label for="emailInput">Email</label>
+      <input
+        type="text"
+        id="emailInput"
+        placeholder=""
+        autocomplete="off"
+      /><br />
+      <button type="button" onclick="handleSaveChanges()">Save Changes</button>
+    </form>
+
+    <h3>Change password</h3>
+    <input type="email" id="hiddenEmail" hidden />
+    <button type="button">Send password reset email</button>
   </section>
 
   <section class="settings-category" id="notification-settings">
     <h2>Notification Settings</h2>
     <!-- Add notification settings content here -->
   </section>
+
+  <div id="popup" class="popup">
+    <div class="popup-header">
+      <p id="popupHeader"></p>
+      <span class="close-button" onclick="togglePopup()">&times;</span>
+    </div>
+    <div class="popup-content">
+      <p id="popupMessage"></p>
+      <div id="countdown">
+        <div id="countdown-number"></div>
+        <svg>
+          <circle r="18" cx="20" cy="20"></circle>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div id="overlay"></div>
 
   <!-- Add more sections for additional settings categories -->
 </main>
