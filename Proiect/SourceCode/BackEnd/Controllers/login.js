@@ -39,7 +39,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { userId: user.user_id, userRole: user.user_role },
       process.env.JWT_SECRET,
-      { expiresIn: "8h" }
+      { expiresIn: "24h" }
     );
 
     const isProduction = process.env.NODE_ENV === "production" || false;

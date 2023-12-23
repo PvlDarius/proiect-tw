@@ -13,10 +13,6 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
-const generateToken = () => {
-  return uuidv4();
-};
-
 const transporter = nodemailer.createTransport({
   host: "smtp-mail.outlook.com",
   secureConnection: false,
@@ -30,6 +26,29 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Add this function to generate a reset token
+const generateResetToken = () => {
+  return uuidv4();
+};
+
+// Add this function to send the reset password email
+const sendResetPasswordEmail = async (email, resetToken) => {
+  const mailOptions = {
+    from: process.env.EMAIL_ADDRESS,
+    to: email,
+    subject: "Password Reset",
+    text: `Click the following link to reset your password: http://localhost:8080/auth/reset-password?token=${resetToken}`,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error("Error sending reset password email:", error);
+    throw error; // Propagate the error to handle it in the calling function
+  }
+};
+
+// Modify the forgotPassword API to use the new functions
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
 
@@ -44,7 +63,7 @@ exports.forgotPassword = async (req, res) => {
       );
     }
 
-    const resetToken = generateToken();
+    const resetToken = generateResetToken();
 
     const expirationTime = new Date();
     expirationTime.setHours(expirationTime.getHours() + 1);
@@ -54,30 +73,53 @@ exports.forgotPassword = async (req, res) => {
       [resetToken, expirationTime, email]
     );
 
-    const mailOptions = {
-      from: process.env.EMAIL_ADDRESS,
-      to: email,
-      subject: "Password Reset",
-      text: `Click the following link to reset your password: http://localhost:8080/auth/reset-password?token=${resetToken}`,
-    };
+    // Use the new function to send the reset password email
+    await sendResetPasswordEmail(email, resetToken);
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error(error);
-        return res.redirect(
-          "/auth/forgot-password?errorMessage=Failed to send email"
-        );
-      }
-
-      return res.redirect(
-        "/auth/forgot-password?successMessage=Email sent! Check your inbox"
-      );
-    });
+    return res.redirect(
+      "/auth/forgot-password?successMessage=Email sent! Check your inbox"
+    );
   } catch (error) {
     console.error(error);
     return res.redirect(
       "/auth/forgot-password?errorMessage=Internal server error"
     );
+  }
+};
+
+// Add a new route for the reset password email API
+exports.passwordResetEmail = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const [result] = await pool.execute("SELECT * FROM users WHERE email = ?", [
+      email,
+    ]);
+
+    if (!result.length) {
+      return res.status(404).json({ error: "No user found with this email" });
+    }
+
+    const resetToken = generateResetToken();
+
+    const expirationTime = new Date();
+    expirationTime.setHours(expirationTime.getHours() + 1);
+
+    await pool.execute(
+      "UPDATE users SET resetToken = ?, resetTokenExpiry = ? WHERE email = ?",
+      [resetToken, expirationTime, email]
+    );
+
+    // Use the function to send the reset password email
+    await sendResetPasswordEmail(email, resetToken);
+
+    return res.status(200).json({
+      success: true,
+      message: "Reset password email sent successfully",
+    });
+  } catch (error) {
+    console.error("Error sending reset password email:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 

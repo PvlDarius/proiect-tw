@@ -37,6 +37,7 @@ router.post("/signup", authController.signup);
 router.post("/login", authController.login);
 router.post("/forgot-password", authController.forgotPassword);
 router.post("/reset-password", authController.resetPassword);
+router.post("/send-email", authController.passwordResetEmail);
 
 router.get("/forgot-password", (req, res) => {
   res.render("login-signup-frame", {
@@ -47,6 +48,7 @@ router.get("/forgot-password", (req, res) => {
 
 router.get("/reset-password", (req, res) => {
   const token = req.query.token;
+  res.clearCookie("jwt");
   res.render("login-signup-frame", {
     body: "reset-password",
     layout: false,

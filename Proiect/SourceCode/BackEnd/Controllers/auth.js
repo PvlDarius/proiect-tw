@@ -1,6 +1,10 @@
 const { signup } = require("./signup");
 const { login } = require("./login");
-const { forgotPassword, resetPassword } = require("./password");
+const {
+  forgotPassword,
+  resetPassword,
+  passwordResetEmail,
+} = require("./password");
 const mysql = require("mysql2/promise");
 
 const pool = mysql.createPool({
@@ -17,6 +21,7 @@ exports.signup = signup;
 exports.login = login;
 exports.forgotPassword = forgotPassword;
 exports.resetPassword = resetPassword;
+exports.passwordResetEmail = passwordResetEmail;
 
 exports.getUserInfo = async (req, res) => {
   const userRole = req.user ? req.user.userRole : null;
