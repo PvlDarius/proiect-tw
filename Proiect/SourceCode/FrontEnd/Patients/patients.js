@@ -112,11 +112,7 @@ async function fetchUserInfo(page) {
     const response = await fetch("/auth/user-info");
     const userInfo = await response.json();
 
-    if (
-      userInfo &&
-      userInfo.firstName !== undefined &&
-      userInfo.firstName !== null
-    ) {
+    if (userInfo && userInfo.id !== undefined && userInfo.id !== null) {
       const userImageElement = document.querySelector(".user-img");
       const imagePath = `/UserImages/${userInfo.userImage}`;
       userImageElement.src = imagePath;
@@ -152,11 +148,15 @@ async function fetchUserInfo(page) {
       const userRoleElement = document.getElementById("user-role");
       userRoleElement.textContent =
         userInfo.userRole.charAt(0).toUpperCase() + userInfo.userRole.slice(1);
+
+      return userInfo; // Return the userInfo object
     } else {
-      console.error("Error: userInfo or firstName is null");
+      console.error("Error: userInfo or id is null");
+      return null;
     }
   } catch (error) {
     console.error("Error fetching user information:", error);
+    return null;
   }
 }
 
@@ -313,9 +313,141 @@ function renderDoctors(doctors, searchQuery = "") {
       doctorSpecialization.textContent = doctor.specialization;
       doctorElement.appendChild(doctorSpecialization);
 
+      const doctorClinic = document.createElement("p");
+      doctorClinic.textContent = doctor.clinic;
+      doctorElement.appendChild(doctorClinic);
+
+      const appointmentButton = document.createElement("button");
+      appointmentButton.textContent = "Make Appointment";
+      appointmentButton.addEventListener("click", () =>
+        openAppointmentForm(doctor)
+      );
+
+      const doctorIdInput = document.createElement("input");
+      doctorIdInput.type = "hidden";
+      doctorIdInput.name = "doctorId";
+      doctorIdInput.value = doctor.id;
+      doctorElement.appendChild(doctorIdInput);
+
+      doctorElement.appendChild(appointmentButton);
+
       doctorsContainer.appendChild(doctorElement);
     }
   });
+}
+
+function openAppointmentForm(doctor) {
+  // Get current date and time
+  const currentDate = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
+  const currentTime = new Date().toTimeString().split(" ")[0]; // Format: HH:mm
+  const formattedTime = currentTime.split(":").slice(0, 2).join(":");
+
+  // Create appointment form
+  const appointmentForm = document.createElement("div");
+  appointmentForm.innerHTML = `
+    <h2>Make Appointment</h2>
+    <input type="hidden" id="id" name="id" value="${doctor.id}">
+
+    <label for="doctor">Doctor:</label>
+    <input type="text" id="doctor" value="${doctor.name}" readonly><br>
+    
+    <label for="specialization">Specialization:</label>
+    <input type="text" id="specialization" value="${doctor.specialization}" readonly><br>
+
+    <label for="appointmentDate">Select Date:</label>
+    <input type="date" id="appointmentDate" value="${currentDate}" required><br>
+
+    <label for="appointmentTime">Select Time:</label>
+    <input type="time" id="appointmentTime" value="${formattedTime}" required><br>
+
+    <button onclick="submitAppointmentForm()">Submit</button>
+    <div id="popup" class="popup">
+    <div class="popup-header">
+      <p id="popupHeader"></p>
+      <span class="close-button" onclick="togglePopup()">&times;</span>
+    </div>
+    <div class="popup-content">
+      <p id="popupMessage"></p>
+      <div id="countdown">
+        <div id="countdown-number"></div>
+        <svg>
+          <circle r="18" cx="20" cy="20"></circle>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div id="overlay"></div>
+  `;
+
+  // Append the form to the main content container
+  const mainContentContainer = document.getElementById(
+    "main-content-container"
+  );
+  mainContentContainer.innerHTML = "";
+  mainContentContainer.appendChild(appointmentForm);
+}
+
+async function submitAppointmentForm() {
+  const userInfo = await fetchUserInfo("appointment-form");
+
+  // Continue with the submission logic
+
+  const doctorIdInput = document.getElementById("id");
+  const appointmentDateInput = document.getElementById("appointmentDate");
+  const appointmentTimeInput = document.getElementById("appointmentTime");
+
+  // Validate the date to ensure it's not in the past
+  const selectedDate = new Date(appointmentDateInput.value);
+  const currentDate = new Date();
+
+  if (selectedDate < currentDate) {
+    displayPopup("Please select a date in the future.", "warning");
+    return;
+  }
+
+  // Extract other form data as needed
+  const doctorId = doctorIdInput.value;
+  const userId = userInfo.id;
+  const selectedDateFormatted = appointmentDateInput.value;
+  const selectedTime = appointmentTimeInput.value;
+
+  // You can now send the appointment data to the backend or perform further validation as needed
+
+  // Example: Send data to the backend
+  const appointmentData = {
+    doctorId,
+    userId,
+    selectedDate: selectedDateFormatted,
+    selectedTime,
+  };
+
+  try {
+    const token = sessionStorage.getItem("jwt");
+    if (!token) {
+      displayPopup("User not authenticated. Please log in.", "error");
+      return;
+    }
+
+    const response = await fetch("/auth/appointments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(appointmentData),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      displayPopup("Appointment submitted successfully!", "success");
+    } else {
+      displayPopup(data.error || "Error submitting appointment", "error");
+    }
+  } catch (error) {
+    console.error("Error submitting appointment:", error);
+    displayPopup("Error submitting appointment. Please try again.", "error");
+  }
 }
 
 // Functii folosite exclusiv in "settings.ejs"

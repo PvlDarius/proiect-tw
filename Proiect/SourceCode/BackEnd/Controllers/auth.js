@@ -39,6 +39,7 @@ exports.getUserInfo = async (req, res) => {
     if (result.length > 0) {
       const user = result[0];
       const userInfo = {
+        id: user.user_id,
         firstName: user.first_name,
         lastName: user.last_name,
         email: user.email,

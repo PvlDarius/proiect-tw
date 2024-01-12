@@ -45,9 +45,11 @@ app.get("/api/doctors", (req, res) => {
         res.status(500).json({ error: "Internal server error" });
       } else {
         const doctorsData = results.map((doctor) => ({
+          id: `${doctor.doctor_id}`,
           name: `${doctor.first_name} ${doctor.last_name}`,
           image: doctor.user_image,
           specialization: doctor.specialization,
+          clinic: doctor.clinic,
         }));
 
         res.json(doctorsData);
@@ -157,6 +159,19 @@ app.get("/patient/appointments", authMiddleware, checkUserRole, (req, res) => {
     res.status(403).send("Forbidden");
   }
 });
+
+app.get(
+  "/patient/appointment-form",
+  authMiddleware,
+  checkUserRole,
+  (req, res) => {
+    if (req.userRole === "patient") {
+      res.render("../Patients/appointment-form");
+    } else {
+      res.status(403).send("Forbidden");
+    }
+  }
+);
 
 app.get("/patient/file", authMiddleware, checkUserRole, (req, res) => {
   if (req.userRole === "patient") {

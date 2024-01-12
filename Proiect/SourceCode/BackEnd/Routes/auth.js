@@ -158,4 +158,42 @@ router.post(
   }
 );
 
+router.post("/appointments", async (req, res) => {
+  try {
+    // Extract appointment data from the request body
+    const { doctorId, userId, selectedDate, selectedTime } = req.body;
+
+    // Ensure that the appointment data is valid (you can add more validation as needed)
+    if (!doctorId || !userId || !selectedDate || !selectedTime) {
+      return res
+        .status(400)
+        .json({ success: false, error: "Invalid appointment data" });
+    }
+
+    // Save the appointment data to the database
+    const insertQuery =
+      "INSERT INTO appointments (doctor_id, patient_id, appointment_date, appointment_hour) VALUES (?, ?, ?, ?)";
+    db.query(
+      insertQuery,
+      [doctorId, userId, selectedDate, selectedTime],
+      (insertError, insertResults) => {
+        if (insertError) {
+          console.error("Error inserting appointment record:", insertError);
+          res
+            .status(500)
+            .json({ success: false, error: "Internal server error" });
+        } else {
+          res.json({
+            success: true,
+            message: "Appointment submitted successfully",
+          });
+        }
+      }
+    );
+  } catch (error) {
+    console.error("Error submitting appointment:", error);
+    res.status(500).json({ success: false, error: "Internal Server Error" });
+  }
+});
+
 module.exports = router;
