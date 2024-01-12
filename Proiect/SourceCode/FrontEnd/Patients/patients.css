@@ -212,6 +212,76 @@ body{
     cursor: pointer;
 }
 
+#profile-settings{
+    display: block;
+    margin-bottom: 2rem;
+}
+
+.profile-settings{
+    margin-top: 1rem;
+}
+
+.profile-picture-container{
+    background: #f5f5f5;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    border-radius: 2rem;
+    margin-bottom: 2rem;
+}
+
+.profile-info-container{
+    background: #f5f5f5;
+    padding: 5px 10px;
+    border-radius: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.profile-info{
+    padding: 5px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.send-email-container{
+    background: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+}
+
+.button{
+    color: #fafafa;
+    background: #3471B8;
+    padding: 5px 10px;
+    height: 50px;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    font-size: 17px;
+    cursor: pointer;
+    box-shadow: 3px 0 10px rgba(0,0,0,.5);
+    transition: 0.3s;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.button:hover{
+    background: #214976;
+}
+
+.inputfile{
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
 .current-profile-picture{
     width: 20rem;
     height: 20rem;
@@ -222,6 +292,77 @@ body{
 
 .current-profile-picture img{
     width: 100%;
+}
+
+.input-box{
+    position: relative;
+    margin: 31px 0;
+    width: 300px;
+    border-bottom: 2px solid #428ce0;
+}
+
+.input-box input{
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    padding: 0 20px 0 5px;
+    color: #428ce0;
+    font-size: 16px;
+}
+
+input::placeholder{
+    color: #428ce0;
+}
+
+.input-box i{
+    position: absolute;
+    color: #428ce0;
+    right: 0;
+}
+
+.input-box i.fa-calendar-days{
+    z-index: -100;
+}
+
+.input-box input[type="date"]{
+    width: 320px;
+    z-index: 10000;
+}
+
+.input-box input[type="date"]::-webkit-calendar-picker-indicator{
+    opacity: 0;
+    cursor: pointer;
+}
+
+.input-box select{
+    border: none;
+    appearance: none;
+    background: transparent;
+    width: 300px;
+    color: #428ce0;
+    font-size: 17px;
+    font-family: "Poppins", sans-serif;
+    padding-right: 5px;
+    cursor: pointer;
+}
+
+.input-box select option{
+    color: #214976;
+    background: #fafafa;
+}
+
+.input-box select:focus{
+    outline: none;
+}
+
+.input-box i.fa-venus-mars{
+    z-index: -100;
+}
+
+.input-box input[type="tel"]{
+    margin-left: 3rem;
+    border-left: 1.5px solid #428ce0;
 }
 
 .popup{
@@ -275,40 +416,40 @@ body{
     height: 40px;
     width: 40px;
     text-align: center;
-  }
+}
   
-  #countdown-number {
+#countdown-number {
     color: #428ce0;
     display: inline-block;
     line-height: 40px;
-  }
+}
   
-  svg {
+svg {
     position: absolute;
     top: 0;
     right: 0;
     width: 40px;
     height: 40px;
     transform: rotateY(-180deg) rotateZ(-90deg);
-  }
+}
   
-  svg circle {
+svg circle {
     stroke-dasharray: 113px;
     stroke-dashoffset: 0px;
     stroke-linecap: round;
     stroke-width: 2px;
     stroke: #428ce0;
     fill: none;
-  }
+}
   
-  @keyframes countdown {
+@keyframes countdown {
     from {
-      stroke-dashoffset: 0px;
+        stroke-dashoffset: 0px;
     }
     to {
-      stroke-dashoffset: 113px;
-    }
-  }
+        stroke-dashoffset: 113px;
+    }   
+}
 
 #overlay{
     position: fixed;
@@ -328,6 +469,8 @@ body{
     pointer-events: all;
 }
 
+
+
 @media only screen and (max-width: 1024px){
     [class*="col-"] {
         width: 100%;
@@ -346,6 +489,24 @@ body{
         grid-auto-rows: 1fr;
         grid-template-columns: 1fr 1fr 1fr;
     }
+
+    .profile-settings{
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: 1fr;
+        grid-column-gap: 15px;
+        grid-row-gap: 15px;
+    }
+
+    .profile-picture-container{
+        grid-area: 1 / 1 / 2 / 2;
+    }
+
+    .profile-info-container{
+        grid-area: 1 / 2 / 2 / 3;
+    }
+
+    
 }
 
 @media only screen and (max-width: 768px){
@@ -378,7 +539,7 @@ body{
   
 @media only screen and (min-width: 1024px) {
     /* For desktop: */
-
+/* 
     .col-1 {width: 8.33%;}
     .col-2 {width: 16.66%;}
     .col-3 {width: 25%;}
@@ -390,5 +551,5 @@ body{
     .col-9 {width: 75%;}
     .col-10 {width: 83.33%;}
     .col-11 {width: 91.66%;}
-    .col-12 {width: 100%;}
+    .col-12 {width: 100%;} */
 }

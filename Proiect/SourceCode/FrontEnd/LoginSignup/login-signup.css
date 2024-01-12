@@ -28,6 +28,7 @@ body{
 .navbar{
     top: 2rem;
     position: fixed;
+    margin-left: 2rem;
 }
 
 .navbar .logo{
@@ -57,13 +58,14 @@ body{
 
 .form-container{
     position: relative;
-    width: 400px;
-    height: 600px;
+    min-width: 400px;
+    min-height: 600px;
     border: 2px solid rgba(255,255,2550.5);
     border-radius: 20px;
     background: rgba(52, 113, 183, 0.6);
     backdrop-filter: blur(15px);
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
@@ -101,10 +103,55 @@ input::placeholder{
     right: 0;
 }
 
+.input-box i.fa-calendar-days{
+    z-index: -100;
+}
+
+.input-box input[type="date"]{
+    width: 320px;
+    z-index: 10000;
+}
+
+.input-box input[type="date"]::-webkit-calendar-picker-indicator{
+    opacity: 0;
+    cursor: pointer;
+}
+
+.input-box select{
+    border: none;
+    appearance: none;
+    background: transparent;
+    width: 300px;
+    color: #fafafa;
+    font-size: 17px;
+    font-family: "Poppins", sans-serif;
+    padding-right: 5px;
+    cursor: pointer;
+}
+
+.input-box select option{
+    color: #214976;
+    background: #fafafa;
+}
+
+.input-box select:focus{
+    outline: none;
+}
+
+.input-box i.fa-venus-mars{
+    z-index: -100;
+}
+
+.input-box input[type="tel"]{
+    margin-left: 3rem;
+    border-left: 1.5px solid #fafafa;
+}
+
 .button{
     color: #fafafa;
     background: #3471B8;
     width: 100%;
+    max-width: 400px;
     height: 50px;
     border-radius: 5px;
     outline: none;
@@ -165,5 +212,39 @@ input::placeholder{
 
 .toggle-password-text:hover{
     color: #214976;
+}
 
+.grid{
+    display: block;
+}
+
+.signup-text{
+    margin-top: 7rem;
+}
+
+#btn{
+    margin-bottom: 2rem;
+}
+
+@media only screen and (min-width: 768px)  {
+    .grid{
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: 1fr;
+        grid-column-gap: 20px;
+        grid-row-gap: 0px;
+    }
+
+    .column1{
+        grid-area: 1 / 1 / 2 / 2;
+        margin-left: 2rem;
+    }
+    
+    .column2{
+        grid-area: 1 / 2 / 2 / 3;
+    }
+
+    #btn{
+        margin-left: 9rem;
+    }
 }

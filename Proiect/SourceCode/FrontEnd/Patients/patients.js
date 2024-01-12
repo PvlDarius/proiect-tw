@@ -112,32 +112,49 @@ async function fetchUserInfo(page) {
     const response = await fetch("/auth/user-info");
     const userInfo = await response.json();
 
-    const userImageElement = document.querySelector(".user-img");
-    const imagePath = `/UserImages/${userInfo.userImage}`;
-    userImageElement.src = imagePath;
+    if (
+      userInfo &&
+      userInfo.firstName !== undefined &&
+      userInfo.firstName !== null
+    ) {
+      const userImageElement = document.querySelector(".user-img");
+      const imagePath = `/UserImages/${userInfo.userImage}`;
+      userImageElement.src = imagePath;
 
-    if (page === "settings") {
-      const currentProfilePicture = document.getElementById(
-        "currentProfilePicture"
-      );
-      if (currentProfilePicture) {
-        currentProfilePicture.src = imagePath;
+      if (page === "settings") {
+        const currentProfilePicture = document.getElementById(
+          "currentProfilePicture"
+        );
+        if (currentProfilePicture) {
+          currentProfilePicture.src = imagePath;
+        }
+
+        const firstName = document.getElementById("firstNameInput");
+        const lastName = document.getElementById("lastNameInput");
+        const email = document.getElementById("emailInput");
+        const birthday = document.getElementById("birthdayInput");
+        const gender = document.getElementById("genderInput");
+        const city = document.getElementById("cityInput");
+
+        firstName.value = `${userInfo.firstName}`;
+        lastName.value = `${userInfo.lastName}`;
+        email.value = `${userInfo.email}`;
+        birthday.value = new Date(userInfo.birthday).toLocaleDateString(
+          "en-CA"
+        );
+        gender.value = `${userInfo.gender}`;
+        city.value = `${userInfo.city}`;
       }
-      const firstName = document.getElementById("firstNameInput");
-      const lastName = document.getElementById("lastNameInput");
-      const email = document.getElementById("emailInput");
 
-      firstName.value = `${userInfo.firstName}`;
-      lastName.value = `${userInfo.lastName}`;
-      email.value = `${userInfo.email}`;
+      const userNameElement = document.getElementById("user-name");
+      userNameElement.textContent = `${userInfo.firstName} ${userInfo.lastName}`;
+
+      const userRoleElement = document.getElementById("user-role");
+      userRoleElement.textContent =
+        userInfo.userRole.charAt(0).toUpperCase() + userInfo.userRole.slice(1);
+    } else {
+      console.error("Error: userInfo or firstName is null");
     }
-
-    const userNameElement = document.getElementById("user-name");
-    userNameElement.textContent = `${userInfo.firstName} ${userInfo.lastName}`;
-
-    const userRoleElement = document.getElementById("user-role");
-    userRoleElement.textContent =
-      userInfo.userRole.charAt(0).toUpperCase() + userInfo.userRole.slice(1);
   } catch (error) {
     console.error("Error fetching user information:", error);
   }
@@ -369,6 +386,9 @@ function handleSaveChanges() {
   const firstNameInput = document.getElementById("firstNameInput");
   const lastNameInput = document.getElementById("lastNameInput");
   const emailInput = document.getElementById("emailInput");
+  const birthdayInput = document.getElementById("birthdayInput");
+  const genderInput = document.getElementById("genderInput");
+  const cityInput = document.getElementById("cityInput");
 
   if (firstNameInput.value && lastNameInput.value && emailInput.value) {
     const token = sessionStorage.getItem("jwt");
@@ -377,6 +397,9 @@ function handleSaveChanges() {
       firstName: firstNameInput.value,
       lastName: lastNameInput.value,
       email: emailInput.value,
+      birthday: birthdayInput.value,
+      gender: genderInput.value,
+      city: cityInput.value,
     };
 
     fetch("/auth/update-profile", {

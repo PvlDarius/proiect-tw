@@ -24,31 +24,30 @@ exports.resetPassword = resetPassword;
 exports.passwordResetEmail = passwordResetEmail;
 
 exports.getUserInfo = async (req, res) => {
-  const userRole = req.user ? req.user.userRole : null;
+  const userId = req.user ? req.user.userId : null;
 
-  if (!userRole) {
-    return res
-      .status(401)
-      .json({ error: "Unauthorized. User role not found." });
+  if (!userId) {
+    return res.status(401).json({ error: "Unauthorized. User ID not found." });
   }
 
   try {
     const [result] = await pool.execute(
-      "SELECT * FROM users WHERE user_role = ?",
-      [userRole]
+      "SELECT * FROM users WHERE user_id = ?",
+      [userId]
     );
 
     if (result.length > 0) {
       const user = result[0];
-
-      // Send only necessary user information to avoid exposing sensitive data
       const userInfo = {
         firstName: user.first_name,
         lastName: user.last_name,
         email: user.email,
         userRole: user.user_role,
         userImage: user.user_image,
-        // Add other necessary user properties here
+        birthday: user.birthday,
+        gender: user.gender,
+        city: user.city,
+        phone: user.phone,
       };
 
       res.json(userInfo);

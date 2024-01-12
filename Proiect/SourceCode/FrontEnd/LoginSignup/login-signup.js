@@ -19,41 +19,80 @@ function validateLogin() {
 function validateSignup() {
   document.getElementById("validation-message").innerHTML = "";
 
-  if (document.formFill.first_name.value == "") {
+  const firstName = document.formFill.first_name.value;
+  const lastName = document.formFill.last_name.value;
+  const email = document.formFill.email.value;
+  const password = document.formFill.password.value;
+  const confirmPassword = document.formFill.confirmPassword.value;
+  const birthday = document.formFill.birthday.value;
+  const gender = document.formFill.gender.value;
+  const city = document.formFill.city.value;
+  const phone = phoneInput.getNumber(); // Assuming phoneInput is the instance of intlTelInput
+
+  if (firstName === "") {
     document.getElementById("validation-message").innerHTML =
       "Please enter your first name!";
     return false;
-  } else if (document.formFill.last_name.value == "") {
+  } else if (lastName === "") {
     document.getElementById("validation-message").innerHTML =
       "Please enter your last name!";
     return false;
-  } else if (document.formFill.email.value == "") {
+  } else if (email === "") {
     document.getElementById("validation-message").innerHTML =
       "Please enter your email!";
     return false;
-  } else if (document.formFill.password.value == "") {
+  } else if (password === "") {
     document.getElementById("validation-message").innerHTML =
       "Please enter a password!";
     return false;
-  } else if (document.formFill.confirmPassword.value == "") {
+  } else if (confirmPassword === "") {
     document.getElementById("validation-message").innerHTML =
       "Please confirm your password!";
     return false;
-  } else if (
-    document.formFill.password.value !== document.formFill.confirmPassword.value
-  ) {
+  } else if (password !== confirmPassword) {
     document.getElementById("validation-message").innerHTML =
       "The entered passwords do not match!";
     return false;
-  } else if (document.formFill.password.value.length < 6) {
+  } else if (password.length < 6) {
     document.getElementById("validation-message").innerHTML =
       "Password must be at least 6 characters long!";
+    return false;
+  } else if (birthday === "") {
+    document.getElementById("validation-message").innerHTML =
+      "Please enter your birthday!";
+    return false;
+  } else if (!isUserAbove18(birthday)) {
+    document.getElementById("validation-message").innerHTML =
+      "You must be 18 years or older to sign up!";
+    return false;
+  } else if (gender === "placeholder") {
+    document.getElementById("validation-message").innerHTML =
+      "Please select your gender!";
+    return false;
+  } else if (city === "") {
+    document.getElementById("validation-message").innerHTML =
+      "Please enter your city!";
+    return false;
+  } else if (phone === "") {
+    document.getElementById("validation-message").innerHTML =
+      "Please enter your phone number!";
     return false;
   }
 
   document.getElementById("signupForm").submit();
 
   return false;
+}
+
+function isUserAbove18(birthday) {
+  // Parse the birthday string to a Date object
+  const birthDate = new Date(birthday);
+
+  // Calculate the age difference in years
+  const ageDifference = new Date().getFullYear() - birthDate.getFullYear();
+
+  // Check if the user is 18 or older
+  return ageDifference >= 18;
 }
 
 function validateForgotPassword() {
@@ -176,7 +215,12 @@ function validateAndSubmitSignup() {
       email: document.formFill.email.value,
       password: document.formFill.password.value,
       confirmPassword: document.formFill.confirmPassword.value,
+      birthday: document.formFill.birthday.value,
+      gender: document.formFill.gender.value,
+      city: document.formFill.city.value,
+      phone: phoneInput.getNumber(),
     };
+
     submitForm(formData, "signup");
   } else {
     return false;
@@ -222,4 +266,24 @@ document.addEventListener("DOMContentLoaded", async () => {
       loadAuthPage(page);
     });
   });
+});
+
+const phoneInputField = document.querySelector("#phone");
+const phoneInput = window.intlTelInput(phoneInputField, {
+  initialCountry: "ro",
+  preferredCountries: [
+    "ro",
+    "md",
+    "hu",
+    "rs",
+    "bg",
+    "ua",
+    "de",
+    "gb",
+    "us",
+    "it",
+    "es",
+  ],
+  utilsScript:
+    "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
 });

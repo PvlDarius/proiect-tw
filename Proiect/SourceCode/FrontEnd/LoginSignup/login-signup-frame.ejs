@@ -7,6 +7,11 @@
       src="https://kit.fontawesome.com/88f38507d4.js"
       crossorigin="anonymous"
     ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
     <link rel="icon" href="../Images/heart-pulse-solid.svg" />
     <link rel="stylesheet" href="/LoginSignup/login-signup.css" />
     <title>Join our App!</title>
@@ -14,6 +19,7 @@
   <body>
     <div class="container">
       <div class="form-container">
+        <%- include('navbar') %>
         <main class="main-content" id="main-content-container">
           <% if (body === "login") { %> <%- include('login') %> <% } else if
           (body === "signup") { %> <%- include('signup') %> <% } else if (body

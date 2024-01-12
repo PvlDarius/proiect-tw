@@ -93,7 +93,7 @@ router.post(
         const updateQuery = "UPDATE users SET user_image = ? WHERE user_id = ?";
         db.query(
           updateQuery,
-          [fileName, user.userId], // Change this line
+          [fileName, user.userId],
           (updateError, updateResults) => {
             if (updateError) {
               console.error("Error updating user record:", updateError);
@@ -115,6 +115,9 @@ router.post(
     check("firstName").notEmpty().withMessage("First name is required"),
     check("lastName").notEmpty().withMessage("Last name is required"),
     check("email").isEmail().withMessage("Invalid email address"),
+    check("birthday").notEmpty().withMessage("Birthday is required"),
+    check("gender").notEmpty().withMessage("Gender is required"),
+    check("city").notEmpty().withMessage("City is required"),
   ],
   async (req, res) => {
     try {
@@ -128,14 +131,14 @@ router.post(
         return res.status(401).json({ error: "Unauthorized. User not found." });
       }
 
-      const { firstName, lastName, email } = req.body;
+      const { firstName, lastName, email, birthday, gender, city } = req.body;
 
       const updateQuery =
-        "UPDATE users SET first_name = ?, last_name = ?, email = ? WHERE user_id = ?";
+        "UPDATE users SET first_name = ?, last_name = ?, email = ?, birthday = ?, gender = ?, city = ? WHERE user_id = ?";
 
       db.query(
         updateQuery,
-        [firstName, lastName, email, user.userId],
+        [firstName, lastName, email, birthday, gender, city, user.userId],
         (updateError, updateResults) => {
           if (updateError) {
             console.error("Error updating user record:", updateError);

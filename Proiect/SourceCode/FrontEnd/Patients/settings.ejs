@@ -3,57 +3,103 @@
 
   <section class="settings-category" id="profile-settings">
     <h2>Profile Settings</h2>
+    <div class="profile-settings">
+      <div class="setting profile-picture-container">
+        <h3>Profile picture</h3>
+        <img
+          src="../../Public/UserImages/2_1703282396781.jpg"
+          alt="current-profile-picture"
+          class="current-profile-picture"
+          id="currentProfilePicture"
+        />
 
-    <!-- Display current profile picture -->
-    <h3>Change profile picture</h3>
-    <div class="profile-picture-container">
-      <img
-        src=""
-        alt="current-profile-picture"
-        class="current-profile-picture"
-        id="currentProfilePicture"
-      />
+        <input
+          type="file"
+          name="file"
+          class="inputfile"
+          id="profilePictureInput"
+          accept=".png, .jpg, .jpeg"
+          onchange="displaySelectedPicture(this)"
+        />
+        <div class="button">
+          <label for="profilePictureInput">Choose a file</label>
+        </div>
+        <button onclick="saveProfilePicture()" class="button">
+          Save Profile Picture
+        </button>
+      </div>
+
+      <div class="profile-info-container">
+        <h3>Change user information</h3>
+        <div class="setting profile-info">
+          <form id="profileForm">
+            <div class="input-box">
+              <i class="fa-solid fa-user"></i>
+              <input
+                type="text"
+                id="firstNameInput"
+                name="first_name"
+                placeholder="First Name"
+              />
+              <label id="first_name-validation"></label>
+            </div>
+            <div class="input-box">
+              <i class="fa-solid fa-users"></i>
+              <input
+                type="text"
+                id="lastNameInput"
+                name="last_name"
+                placeholder="Last Name"
+              />
+              <label id="last_name-validation"></label>
+            </div>
+            <div class="input-box">
+              <i class="fa-solid fa-envelope"></i>
+              <input
+                type="email"
+                id="emailInput"
+                name="email"
+                placeholder="Email"
+              />
+              <label id="email-validation"></label>
+            </div>
+            <div class="input-box">
+              <i class="fa-solid fa-calendar-days" style="z-index: 100;"></i>
+              <input type="date" id="birthdayInput" name="birthday" />
+              <label id="birthday-validation"></label>
+            </div>
+      
+            <div class="input-box">
+              <i class="fa-solid fa-venus-mars" style="z-index: 100;"></i>
+              <select name="gender" id="genderInput">
+                <option value="placeholder">Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+      
+            <div class="input-box">
+              <i class="fa-solid fa-city"></i>
+              <input type="text" id="cityInput" name="city" placeholder="City" />
+            </div>
+            
+          </div>
+            <button class="button" type="button" onclick="handleSaveChanges()">
+              Save Changes
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="setting send-email-container">
+        <h3>Change password</h3>
+        <input type="email" id="hiddenEmail" hidden />
+        <button type="button" class="button" onclick="sendPasswordResetEmail()">
+          Send password reset email
+        </button>
+      </div>
     </div>
-
-    <input
-      type="file"
-      id="profilePictureInput"
-      accept=".png, .jpg, .jpeg"
-      onchange="displaySelectedPicture(this)"
-    />
-    <button onclick="saveProfilePicture()">Save Profile Picture</button>
-
-    <h3>Change user information</h3>
-    <form id="profileForm">
-      <label for="firstNameInput">First Name</label>
-      <input
-        type="text"
-        id="firstNameInput"
-        placeholder=""
-        autocomplete="off"
-      /><br />
-      <label for="lastNameInput">Last Name</label>
-      <input
-        type="text"
-        id="lastNameInput"
-        placeholder=""
-        autocomplete="off"
-      /><br />
-      <label for="emailInput">Email</label>
-      <input
-        type="text"
-        id="emailInput"
-        placeholder=""
-        autocomplete="off"
-      /><br />
-      <button type="button" onclick="handleSaveChanges()">Save Changes</button>
-    </form>
-
-    <h3>Change password</h3>
-    <input type="email" id="hiddenEmail" hidden />
-    <button type="button" onclick="sendPasswordResetEmail()">
-      Send password reset email
-    </button>
   </section>
 
   <section class="settings-category" id="notification-settings">
