@@ -4,10 +4,35 @@ const mysql = require("mysql");
 const dotenv = require("dotenv");
 const authMiddleware = require("./Middlewares/authMiddleware");
 const cookieParser = require("cookie-parser");
+const http = require("http");
+const socketIO = require("socket.io");
 
 dotenv.config({ path: "./.env" });
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIO(server);
+
+// Move the handleStatusChange function outside the connection block
+function handleStatusChange(doctorId, newStatus) {
+  // Perform the status change logic
+
+  // Emit a Socket.IO event for status change
+  io.emit("statusChange", { doctorId, newStatus });
+}
+
+io.on("connection", (socket) => {
+  console.log("A user connected");
+
+  // Handle disconnection if needed
+  socket.on("disconnect", () => {
+    console.log("A user disconnected");
+  });
+
+  // Add your Socket.IO event handlers here
+});
+
+module.exports = { io, handleStatusChange };
 
 const db = mysql.createConnection({
   host: process.env.DATABASE_HOST,
@@ -37,25 +62,32 @@ const checkUserRole = (req, res, next) => {
 };
 
 app.get("/api/doctors", (req, res) => {
-  db.query(
-    "SELECT * FROM doctors JOIN users ON doctors.user_id = users.user_id",
-    (error, results) => {
-      if (error) {
-        console.error("Error fetching doctors:", error);
-        res.status(500).json({ error: "Internal server error" });
-      } else {
-        const doctorsData = results.map((doctor) => ({
-          id: `${doctor.doctor_id}`,
-          name: `${doctor.first_name} ${doctor.last_name}`,
-          image: doctor.user_image,
-          specialization: doctor.specialization,
-          clinic: doctor.clinic,
-        }));
+  const doctorId = req.query.doctorId; // Get the doctor ID from query parameters
 
-        res.json(doctorsData);
-      }
+  let query =
+    "SELECT * FROM doctors JOIN users ON doctors.user_id = users.user_id";
+
+  // If doctorId is provided, add a WHERE clause to filter by doctor ID
+  if (doctorId) {
+    query += " WHERE doctors.doctor_id = ?";
+  }
+
+  db.query(query, [doctorId], (error, results) => {
+    if (error) {
+      console.error("Error fetching doctors:", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      const doctorsData = results.map((doctor) => ({
+        id: `${doctor.doctor_id}`,
+        name: `${doctor.first_name} ${doctor.last_name}`,
+        image: doctor.user_image,
+        specialization: doctor.specialization,
+        clinic: doctor.clinic,
+      }));
+
+      res.json(doctorsData);
     }
-  );
+  });
 });
 
 app.get("/api/statistics", (req, res) => {
@@ -194,6 +226,8 @@ app.get("*", (req, res) => {
   res.status(404).send("Page not found");
 });
 
-app.listen(8080, () => {
-  console.log("Server started on port 8080");
+const PORT = process.env.PORT || 8080;
+
+server.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
 });

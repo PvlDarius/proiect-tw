@@ -22,6 +22,23 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("DOMContentLoaded", async () => {
+  if (Notification.permission !== "granted") {
+    Notification.requestPermission();
+  }
+
+  const socket = io();
+
+  socket.on("statusChange", ({ doctorId, newStatus }) => {
+    // Display a notification
+    console.log(`Status change for doctor ${doctorId}: ${newStatus}`);
+    // Call a function to display a notification or update UI
+    // You can use your preferred notification library or implement a custom notification UI
+    displayNotification(
+      `Status change for doctor ${doctorId}: ${newStatus}`,
+      "info"
+    );
+  });
+
   const menuItems = document.querySelectorAll(".menu-item");
 
   menuItems.forEach((menuItem) => {
@@ -100,6 +117,14 @@ async function loadPage(page) {
           });
         }
       }
+    }
+
+    if (page === "home") {
+      await fetchAndRenderAppointments();
+    }
+
+    if (page === "settings") {
+      await fetchUserSettings();
     }
   } catch (error) {
     console.error("Error loading page:", error);
@@ -260,6 +285,143 @@ function togglePopup() {
   overlay.classList.toggle("active");
 }
 
+// Functii folosite in "home.ejs"
+function displayNotification(message, type) {
+  const notification = new Notification(type.toUpperCase(), {
+    body: message,
+    icon: "../Images/heart-pulse-solid-big.svg",
+  });
+
+  // You can customize the appearance or add event listeners to the notification as needed
+  notification.onclick = () => {
+    // Handle notification click event
+    console.log(`Notification clicked: ${message}`);
+  };
+}
+
+// Update the renderAppointments function to include notifications
+const renderAppointments = async (appointments) => {
+  const appointmentsContainer = document.getElementById(
+    "appointments-container"
+  );
+
+  // Clear existing content
+  appointmentsContainer.innerHTML = "";
+
+  const appointmentsTitle = document.createElement("h2");
+  appointmentsTitle.innerHTML = "My Appointments";
+  appointmentsContainer.appendChild(appointmentsTitle);
+
+  // Check if there are appointments
+  if (appointments && appointments.length > 0) {
+    // Iterate over each appointment and create div elements
+    for (const appointment of appointments) {
+      const appointmentDiv = document.createElement("div");
+      appointmentDiv.classList.add("appointment-element");
+
+      // Fetch doctor information
+      const doctorInfo = await fetchDoctorInfoById(appointment.doctor_id);
+
+      // Format the date and time
+      const formattedDate = new Date(
+        appointment.appointment_date
+      ).toLocaleDateString("en-GB"); // DD/MM/YYYY
+      const formattedTime = new Date(
+        `2024-01-01T${appointment.appointment_hour}`
+      ).toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }); // HH:MM
+
+      // Display doctor information and appointment details
+      appointmentDiv.innerHTML = `
+        <p>Doctor: ${doctorInfo.name}</p>
+        <p>Specialization: ${doctorInfo.specialization}</p>
+        <p>Clinic: ${doctorInfo.clinic}</p>
+        <p>Date: ${formattedDate}</p>
+        <p>Time: ${formattedTime}</p>
+        <p>Status: <span class="status-color">${appointment.status.toUpperCase()}</span></p>
+      `;
+
+      const statusColor = appointmentDiv.querySelector(".status-color");
+
+      // Set background color based on status
+      switch (appointment.status.toLowerCase()) {
+        case "pending":
+          statusColor.style.backgroundColor = "yellow";
+          break;
+        case "cancelled":
+          statusColor.style.backgroundColor = "red";
+          // Notify on appointment cancellation
+          displayNotification(
+            `Appointment with ${doctorInfo.name} has been cancelled.`,
+            "warning"
+          );
+          break;
+        case "accepted":
+          statusColor.style.backgroundColor = "green";
+          // Notify on appointment acceptance
+          displayNotification(
+            `Appointment with ${doctorInfo.name} has been accepted.`,
+            "success"
+          );
+          break;
+        default:
+          // Handle other statuses if needed
+          break;
+      }
+
+      // Append the div to the container
+      appointmentsContainer.appendChild(appointmentDiv);
+    }
+  } else {
+    // If there are no appointments, display a message
+    appointmentsContainer.textContent = "No appointments available.";
+  }
+};
+
+async function fetchDoctorInfoById(doctorId) {
+  try {
+    const response = await fetch(`/api/doctors?doctorId=${doctorId}`);
+    const doctorInfo = await response.json();
+    return doctorInfo[0]; // Assuming the API returns an array of doctors; use the first one
+  } catch (error) {
+    console.error("Error fetching doctor information:", error);
+    throw error;
+  }
+}
+
+// Function to fetch and render appointments
+const fetchAndRenderAppointments = async () => {
+  const token = sessionStorage.getItem("jwt");
+  try {
+    const response = await fetch("/auth/appointments-info", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      // Parse the JSON response
+      const data = await response.json();
+
+      // Access the appointments data
+      const appointments = data.appointments;
+
+      // Render the appointments in the "appointments-container" div
+      renderAppointments(appointments);
+    } else {
+      // Handle errors (e.g., display an error message)
+      console.error("Error fetching appointments:", response.statusText);
+    }
+  } catch (error) {
+    // Handle unexpected errors
+    console.error("Unexpected error:", error);
+  }
+};
+
 // Functii folosite exclusiv in "appointments.ejs"
 
 // Preluarea informatiilor legate de doctori, cu filtrare
@@ -300,10 +462,16 @@ function renderDoctors(doctors, searchQuery = "") {
       const doctorElement = document.createElement("div");
       doctorElement.classList.add("doctors-container-element");
 
+      const doctorImageContainer = document.createElement("div");
+      doctorImageContainer.classList.add("doctor-img-container");
+
       const doctorImage = document.createElement("img");
       doctorImage.src = imageFolderPath + doctor.image;
       doctorImage.alt = doctor.name;
-      doctorElement.appendChild(doctorImage);
+      doctorImageContainer.appendChild(doctorImage);
+
+      // Append the image container to the main container
+      doctorElement.appendChild(doctorImageContainer);
 
       const doctorName = document.createElement("h3");
       doctorName.textContent = doctor.name;
@@ -345,38 +513,42 @@ function openAppointmentForm(doctor) {
   // Create appointment form
   const appointmentForm = document.createElement("div");
   appointmentForm.innerHTML = `
-    <h2>Make Appointment</h2>
-    <input type="hidden" id="id" name="id" value="${doctor.id}">
+    <div class="appointment-form">
+      <h1>Make Appointment</h1>
+      <input type="hidden" id="id" name="id" value="${doctor.id}">
 
-    <label for="doctor">Doctor:</label>
-    <input type="text" id="doctor" value="${doctor.name}" readonly><br>
-    
-    <label for="specialization">Specialization:</label>
-    <input type="text" id="specialization" value="${doctor.specialization}" readonly><br>
-
-    <label for="appointmentDate">Select Date:</label>
-    <input type="date" id="appointmentDate" value="${currentDate}" required><br>
-
-    <label for="appointmentTime">Select Time:</label>
-    <input type="time" id="appointmentTime" value="${formattedTime}" required><br>
-
-    <button onclick="submitAppointmentForm()">Submit</button>
-    <div id="popup" class="popup">
-    <div class="popup-header">
-      <p id="popupHeader"></p>
-      <span class="close-button" onclick="togglePopup()">&times;</span>
-    </div>
-    <div class="popup-content">
-      <p id="popupMessage"></p>
-      <div id="countdown">
-        <div id="countdown-number"></div>
-        <svg>
-          <circle r="18" cx="20" cy="20"></circle>
-        </svg>
+      <div class="input-box">
+        <label for="doctor">Doctor's name:</label><br>
+        <i class="fa-solid fa-user-doctor"></i>
+        <input type="text" id="doctor" value="${doctor.name}" readonly><br>
       </div>
+
+      <div class="input-box">
+        <label for="specialization">Specialization:</label><br>
+        <i class="fa-solid fa-briefcase-medical"></i>
+        <input type="text" id="specialization" value="${doctor.specialization}" readonly><br>
+      </div>
+
+      <div class="input-box">
+        <label for="clinic">Clinic:</label><br>
+        <i class="fa-solid fa-hospital"></i>
+        <input type="text" id="clinic" value="${doctor.clinic}" readonly><br>
+      </div>
+
+      <div class="input-box">
+        <label for="appointmentDate">Select Date:</label><br>
+        <i class="fa-solid fa-calendar-days"></i>
+        <input type="date" id="appointmentDate" value="${currentDate}" required><br>
+      </div>
+
+      <div class="input-box">
+        <label for="appointmentTime">Select Time:</label><br>
+        <i class="fa-solid fa-clock"></i>
+        <input type="time" id="appointmentTime" value="${formattedTime}" required><br>
+      </div>
+
+      <button onclick="submitAppointmentForm()">Submit</button>
     </div>
-  </div>
-  <div id="overlay"></div>
   `;
 
   // Append the form to the main content container
@@ -397,8 +569,10 @@ async function submitAppointmentForm() {
   const appointmentTimeInput = document.getElementById("appointmentTime");
 
   // Validate the date to ensure it's not in the past
-  const selectedDate = new Date(appointmentDateInput.value);
-  const currentDate = new Date();
+  const selectedDateTime = new Date(
+    `${appointmentDateInput.value}T${appointmentTimeInput.value}`
+  );
+  const currentDateTime = new Date();
 
   if (selectedDate < currentDate) {
     displayPopup("Please select a date in the future.", "warning");
@@ -590,5 +764,103 @@ async function sendPasswordResetEmail() {
     }
   } catch (error) {
     displayPopup("Failed to send reset password email", "error");
+  }
+}
+
+// Function to toggle notification setting and save it
+// Updated toggleNotificationSetting to return a boolean
+// Updated toggleNotificationSetting to return a boolean
+function toggleNotificationSetting() {
+  const notificationToggle = document.getElementById("notificationToggle");
+  const receiveNotifications = notificationToggle.checked;
+
+  // Toggle notification permission based on user preference
+  toggleNotificationPermission(receiveNotifications);
+
+  return receiveNotifications;
+}
+
+function toggleNotificationPermission(receiveNotifications) {
+  if (receiveNotifications) {
+    // Request notification permission if not granted
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+  } else {
+    // Revoke notification permission if it was previously granted
+    if (Notification.permission === "granted") {
+      Notification.requestPermission().then((permission) => {
+        if (permission === "denied") {
+          console.log("Notification permission revoked");
+        }
+      });
+    }
+  }
+}
+
+// Function to save user settings
+async function saveUserSettings() {
+  try {
+    const receiveNotifications = toggleNotificationSetting();
+
+    const response = await fetch(
+      "http://localhost:8080/auth/save-user-settings",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          // Add any additional headers if needed
+        },
+        body: JSON.stringify({ receiveNotifications }),
+      }
+    );
+
+    const data = await response.json();
+
+    // Handle the response as needed
+    if (response.ok) {
+      displayPopup("Settings updated successfully", "success");
+      // Display a confirmation message or update UI as needed
+      const message = receiveNotifications
+        ? "You will now receive notifications."
+        : "You have turned off notifications.";
+      displayNotification(message, "info");
+    } else {
+      console.error("Error saving user settings:", data.error);
+    }
+  } catch (error) {
+    console.error("Error saving user settings:", error);
+  }
+}
+
+async function fetchUserSettings() {
+  try {
+    const response = await fetch("http://localhost:8080/auth/user-settings", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        // Add any additional headers if needed
+      },
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // If the request is successful, update the UI with user settings
+      updateUIWithUserSettings(data.userSettings);
+    } else {
+      console.error("Error fetching user settings:", data.error);
+    }
+  } catch (error) {
+    console.error("Error fetching user settings:", error);
+  }
+}
+
+// Function to update UI with user settings
+function updateUIWithUserSettings(userSettings) {
+  const notificationToggle = document.getElementById("notificationToggle");
+
+  if ("receiveNotifications" in userSettings) {
+    notificationToggle.checked = userSettings.receiveNotifications;
   }
 }

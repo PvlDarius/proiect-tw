@@ -102,27 +102,23 @@
     </div>
   </section>
 
-  <section class="settings-category" id="notification-settings">
-    <h2>Notification Settings</h2>
-    <!-- Add notification settings content here -->
-  </section>
-
-  <div id="popup" class="popup">
-    <div class="popup-header">
-      <p id="popupHeader"></p>
-      <span class="close-button" onclick="togglePopup()">&times;</span>
-    </div>
-    <div class="popup-content">
-      <p id="popupMessage"></p>
-      <div id="countdown">
-        <div id="countdown-number"></div>
-        <svg>
-          <circle r="18" cx="20" cy="20"></circle>
-        </svg>
+  <section class="settings-category" id="user-settings">
+    <h2>User Settings</h2>
+    <div class="notification-settings">
+      <div class="setting notification-toggle-container">
+        <h3>Receive Notifications</h3>
+        <label class="switch">
+          <input
+            type="checkbox"
+            id="notificationToggle"
+            onchange="toggleNotificationSetting()"
+          />
+          <span class="slider"></span>
+        </label>
       </div>
+      <button onclick="saveUserSettings()" class="button">Save User Settings</button>
     </div>
-  </div>
-  <div id="overlay"></div>
+  </section>
 
   <!-- Add more sections for additional settings categories -->
 </main>

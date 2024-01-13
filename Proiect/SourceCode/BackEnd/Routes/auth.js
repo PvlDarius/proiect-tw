@@ -5,6 +5,7 @@ const path = require("path");
 const multer = require("multer");
 const mysql = require("mysql");
 const { check, validationResult } = require("express-validator");
+const { io, handleStatusChange } = require("../server");
 
 const db = mysql.createConnection({
   host: process.env.DATABASE_HOST,
@@ -63,6 +64,14 @@ router.get("/logout", (req, res) => {
 });
 
 router.get("/user-info", authMiddleware, authController.getUserInfo);
+
+router.get("/user-settings", authMiddleware, authController.getUserSettings);
+
+router.get(
+  "/appointments-info",
+  authMiddleware,
+  authController.getAppointmentsInfo
+);
 
 router.post(
   "/upload-profile-picture",
@@ -170,29 +179,101 @@ router.post("/appointments", async (req, res) => {
         .json({ success: false, error: "Invalid appointment data" });
     }
 
-    // Save the appointment data to the database
-    const insertQuery =
-      "INSERT INTO appointments (doctor_id, patient_id, appointment_date, appointment_hour) VALUES (?, ?, ?, ?)";
-    db.query(
-      insertQuery,
-      [doctorId, userId, selectedDate, selectedTime],
-      (insertError, insertResults) => {
-        if (insertError) {
-          console.error("Error inserting appointment record:", insertError);
-          res
-            .status(500)
-            .json({ success: false, error: "Internal server error" });
-        } else {
+    // Create a new Date object representing the selected date and time
+    const selectedDateTime = new Date(`${selectedDate}T${selectedTime}`);
+
+    // Create a new Date object for the current date and time
+    const currentDateTime = new Date();
+
+    // Check if the appointment has passed
+    if (selectedDateTime < currentDateTime) {
+      // If it has passed, set the status to "expired"
+      const expiredStatusQuery =
+        "INSERT INTO appointments (doctor_id, patient_id, appointment_date, appointment_hour, status) VALUES (?, ?, ?, ?, ?)";
+      db.query(
+        expiredStatusQuery,
+        [doctorId, userId, selectedDate, selectedTime, "expired"],
+        (expiredStatusError, expiredStatusResults) => {
+          if (expiredStatusError) {
+            console.error("Error setting expired status:", expiredStatusError);
+            return res
+              .status(500)
+              .json({ success: false, error: "Internal server error" });
+          }
+
+          io.emit("statusChange", {
+            appointmentId: expiredStatusResults.insertId,
+            newStatus: "expired",
+          });
+          // Continue with the response as needed
+        }
+      );
+    } else {
+      // If it hasn't passed, save the appointment data to the database
+      const insertQuery =
+        "INSERT INTO appointments (doctor_id, patient_id, appointment_date, appointment_hour) VALUES (?, ?, ?, ?)";
+      db.query(
+        insertQuery,
+        [doctorId, userId, selectedDate, selectedTime],
+        (insertError, insertResults) => {
+          if (insertError) {
+            console.error("Error inserting appointment record:", insertError);
+            return res
+              .status(500)
+              .json({ success: false, error: "Internal server error" });
+          }
+
+          io.emit("statusChange", {
+            appointmentId: insertResults.insertId,
+            newStatus: "pending", // Modify this based on your logic
+          });
+          // Continue with the response as needed
           res.json({
             success: true,
             message: "Appointment submitted successfully",
           });
         }
-      }
-    );
+      );
+    }
   } catch (error) {
     console.error("Error submitting appointment:", error);
     res.status(500).json({ success: false, error: "Internal Server Error" });
+  }
+});
+
+// Assuming you have the user ID available in the request
+router.post("/save-user-settings", authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { receiveNotifications } = req.body;
+
+    // Delete the existing entry for the user
+    const deleteQuery = "DELETE FROM user_settings WHERE user_id = ?";
+    db.query(deleteQuery, [userId], (deleteError, deleteResults) => {
+      if (deleteError) {
+        console.error("Error deleting user setting:", deleteError);
+        return res.status(500).json({ error: "Internal server error" });
+      }
+
+      // Insert the new user setting
+      const insertQuery =
+        "INSERT INTO user_settings (user_id, receive_notifications) VALUES (?, ?)";
+      db.query(
+        insertQuery,
+        [userId, receiveNotifications],
+        (insertError, insertResults) => {
+          if (insertError) {
+            console.error("Error inserting user setting:", insertError);
+            return res.status(500).json({ error: "Internal server error" });
+          }
+
+          res.json({ success: true });
+        }
+      );
+    });
+  } catch (error) {
+    console.error("Error saving user setting:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
