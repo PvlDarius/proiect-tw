@@ -90,6 +90,47 @@ app.get("/api/doctors", (req, res) => {
   });
 });
 
+app.get("/api/patients", (req, res) => {
+  const patientId = req.query.patientId;
+  const userId = req.query.userId;
+
+  let query =
+    "SELECT * FROM patients JOIN users ON patients.user_id = users.user_id";
+
+  if (patientId) {
+    query += " WHERE patients.user_id = ?";
+  }
+
+  if (userId) {
+    query += " WHERE patients.user_id = ?";
+  }
+
+  db.query(query, [patientId], (error, results) => {
+    if (error) {
+      console.error("Error fetching patients:", error);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+      const patientsData = results.map((patient) => ({
+        id: `${patient.user_id}`,
+        name: `${patient.first_name} ${patient.last_name}`,
+        image: patient.user_image,
+        birthday: patient.birthday,
+        gender: patient.gender,
+        city: patient.city,
+        phone: patient.phone,
+        email: patient.email,
+        age: patient.age,
+        height: patient.height,
+        weight: patient.weight,
+        diagnostics: patient.diagnostics,
+        medications: patient.medications,
+      }));
+
+      res.json(patientsData);
+    }
+  });
+});
+
 app.get("/api/statistics", (req, res) => {
   let doctorsCount, patientsCount, hospitalsCount, diagnosticsCount;
 
@@ -160,9 +201,49 @@ app.get("/admin/home", authMiddleware, checkUserRole, (req, res) => {
   }
 });
 
+app.get("/doctor/", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "doctor") {
+    res.render("../Doctors/doctor-frame");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
 app.get("/doctor/home", authMiddleware, checkUserRole, (req, res) => {
   if (req.userRole === "doctor") {
-    res.render("../Doctors/doctor-home");
+    res.render("../Doctors/home");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
+app.get("/doctor/appointments", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "doctor") {
+    res.render("../Doctors/appointments");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
+app.get("/doctor/patients", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "doctor") {
+    res.render("../Doctors/patients");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
+app.get("/doctor/medical-file", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "doctor") {
+    res.render("../Doctors/medical-file");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
+app.get("/doctor/settings", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "doctor") {
+    res.render("../Doctors/settings");
   } else {
     res.status(403).send("Forbidden");
   }

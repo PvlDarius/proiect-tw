@@ -54,7 +54,7 @@ exports.login = async (req, res) => {
     if (user.user_role === "admin") {
       return res.redirect(`/admin/home?token=${token}`);
     } else if (user.user_role === "doctor") {
-      return res.redirect(`/doctor/home?token=${token}`);
+      return res.redirect(`/doctor/?token=${token}`);
     } else {
       return res.redirect(`/patient/?token=${token}`);
     }

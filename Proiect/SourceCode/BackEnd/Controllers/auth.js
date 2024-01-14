@@ -113,29 +113,70 @@ exports.getAppointmentsInfo = async (req, res) => {
     // Add filters to the query if provided
     if (doctorId) {
       getAppointmentsQuery += " AND doctor_id = ?";
+      queryParams.push(doctorId);
     }
 
     if (specialization) {
       getAppointmentsQuery += " AND specialization = ?";
+      queryParams.push(specialization);
     }
 
     if (clinic) {
       getAppointmentsQuery += " AND clinic = ?";
+      queryParams.push(clinic);
     }
 
     // Execute the query with appropriate parameters
     let queryParams = [userId];
 
-    if (doctorId) {
-      queryParams.push(doctorId);
+    const [results] = await pool.execute(getAppointmentsQuery, queryParams);
+
+    res.json({ success: true, appointments: results });
+  } catch (error) {
+    console.error("Error retrieving appointments:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+exports.getDoctorAppointmentsInfo = async (req, res) => {
+  try {
+    const user = req.user;
+
+    if (!user) {
+      return res.status(401).json({ error: "Unauthorized. Doctor not found." });
     }
 
-    if (specialization) {
-      queryParams.push(specialization);
+    const userId = user.userId;
+
+    // Find the doctorId associated with the userId
+    const doctorIdQuery = "SELECT doctor_id FROM doctors WHERE user_id = ?";
+    const [doctorIdResult] = await pool.execute(doctorIdQuery, [userId]);
+
+    if (doctorIdResult.length === 0) {
+      return res.status(404).json({ error: "Doctor not found." });
     }
 
-    if (clinic) {
-      queryParams.push(clinic);
+    const doctorId = doctorIdResult[0].doctor_id;
+
+    // Extract filter parameters from query
+    const { patientId, status } = req.query;
+
+    // Construct the base query
+    let getAppointmentsQuery = "SELECT * FROM appointments WHERE doctor_id = ?";
+
+    // Initialize an array for query parameters
+    let queryParams = [doctorId];
+
+    // Add filters to the query if provided
+    if (patientId) {
+      getAppointmentsQuery += " AND patient_id = ?";
+      queryParams.push(patientId);
+    }
+
+    // Add status filter to the query if provided
+    if (status) {
+      getAppointmentsQuery += " AND status = ?";
+      queryParams.push(status);
     }
 
     const [results] = await pool.execute(getAppointmentsQuery, queryParams);
