@@ -48,7 +48,7 @@ exports.signup = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 8);
-
+    // Start a transaction
     await db.query("INSERT INTO users SET ?", {
       first_name,
       last_name,
@@ -59,6 +59,36 @@ exports.signup = async (req, res) => {
       gender,
       city,
       phone,
+    });
+
+    // Query the max user_id from the users table
+    const maxUserIdResult = await db.query(
+      "SELECT MAX(user_id) AS max_user_id FROM users"
+    );
+
+    // Get the max user_id
+    const userId = maxUserIdResult[0].max_user_id;
+
+    // Calculate age from birthday considering month and day
+    const birthDate = new Date(birthday);
+    const currentDate = new Date();
+
+    let age = currentDate.getFullYear() - birthDate.getFullYear();
+
+    // Check if the birthday for the current year has already occurred
+    if (
+      currentDate.getMonth() < birthDate.getMonth() ||
+      (currentDate.getMonth() === birthDate.getMonth() &&
+        currentDate.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    // Insert patient data into 'patients' table using the obtained user_id
+    await db.query("INSERT INTO patients SET ?", {
+      user_id: userId,
+      age,
+      // Add other patient-related fields as needed
     });
 
     return res.redirect("/signup?successMessage=Signed in successfully!");

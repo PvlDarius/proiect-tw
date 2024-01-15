@@ -629,22 +629,29 @@ async function openMedicalFile(patientId) {
       const patientData = await response.json();
 
       // Check if patientData is an array and not empty
-      if (Array.isArray(patientData) && patientData.length > 0) {
-        const medicalFileData = patientData[0]; // Assuming medical file info is within the patient data
-
-        // Populate the HTML elements with medical file data
-        populateMedicalFileData(medicalFileData);
+      if (Array.isArray(patientData)) {
+        if (patientData.length > 0) {
+          const medicalFileData = patientData[0];
+          populateMedicalFileData(medicalFileData);
+        } else {
+          const medicalFileData = patientData[0];
+          populateMedicalFileData(medicalFileData);
+          console.log("Patient has no medical history");
+        }
       } else {
+        // Handle the case where patientData is not an array (potential error)
         displayPopup(
           "Error fetching patient information:" + patientData,
           "error"
         );
+        console.log("Patient data: ", patientData);
       }
     } else {
       displayPopup(
         "Error fetching patient information: " + response.statusText,
         "error"
       );
+      console.log("Response data: ", response.statusText);
     }
   } catch (error) {
     displayPopup("Unexpected error:" + error, "error");

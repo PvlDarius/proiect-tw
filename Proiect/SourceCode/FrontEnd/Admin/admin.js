@@ -75,7 +75,7 @@ function setActiveLink(page) {
 // Functie care incarca continutul paginii alese din sidebar
 async function loadPage(page, patientId) {
   try {
-    const response = await fetch(`/doctor/${page}`);
+    const response = await fetch(`/admin/${page}`);
     const pageContent = await response.text();
 
     sidebar.classList.remove("is-active");
@@ -116,15 +116,35 @@ async function loadPage(page, patientId) {
       }
     }
 
+    if (page === "doctors") {
+      fetchAndRenderDoctors();
+
+      const searchInput = document.getElementById("searchInput");
+      if (searchInput) {
+        searchInput.addEventListener("input", () => {
+          const searchQuery = searchInput.value.trim();
+          fetchAndRenderDoctors(searchQuery);
+        });
+
+        const clearSearchIcon = document.getElementById("clearSearch");
+        if (clearSearchIcon) {
+          clearSearchIcon.addEventListener("click", () => {
+            searchInput.value = "";
+            fetchAndRenderDoctors();
+          });
+        }
+      }
+    }
+
     if (page === "settings") {
       await fetchUserSettings();
     }
 
-    if (page === "medical-file") {
-      openMedicalFile(patientId);
-    }
+    // if (page === "medical-file") {
+    //   openMedicalFile(patientId);
+    // }
   } catch (error) {
-    displayPopup("Error loading page: " + error.message, "error");
+    console.log("Error loading page: " + error.message, "error");
   }
 }
 
@@ -173,11 +193,11 @@ async function fetchUserInfo(page) {
 
       return userInfo; // Return the userInfo object
     } else {
-      displayPopup("Error: userInfo or id is null", "error");
+      console.log("Error: userInfo or id is null", "error");
       return null;
     }
   } catch (error) {
-    displayPopup("Error fetching user information:" + error.message, "error");
+    console.log("Error fetching user information:" + error.message, "error");
     return null;
   }
 }
@@ -334,6 +354,9 @@ const renderAppointments = async (appointments) => {
       const appointmentDiv = document.createElement("div");
       appointmentDiv.classList.add("appointment-element");
 
+      // Fetch doctor information
+      const doctorInfo = await fetchDoctorInfoById(appointment.doctor_id);
+
       // Fetch patient information
       const patientInfo = await fetchPatientInfoById(appointment.patient_id);
 
@@ -350,15 +373,15 @@ const renderAppointments = async (appointments) => {
 
       // Display patient information and appointment details
       appointmentDiv.innerHTML = `
-        <p>Patient: ${patientInfo.name}</p>
+        <p>Doctor: ${doctorInfo ? doctorInfo.name : "Unknown"}</p>
+        <p>Patient: ${patientInfo ? patientInfo.name : "Unknown"}</p>
         <p>Date: ${formattedDate}</p>
         <p>Time: ${formattedTime}</p>
         <p>Status: <span class="status-color">${appointment.status.toUpperCase()}</span></p>
       `;
 
-      const statusColor = appointmentDiv.querySelector(".status-color");
-
       // Set background color based on status
+      const statusColor = appointmentDiv.querySelector(".status-color");
       switch (appointment.status.toLowerCase()) {
         case "pending":
           statusColor.style.backgroundColor = "yellow";
@@ -374,34 +397,6 @@ const renderAppointments = async (appointments) => {
           // Handle other statuses if needed
           break;
       }
-
-      const acceptButton = document.createElement("button");
-      acceptButton.textContent = "Accept";
-      acceptButton.classList.add("btn-accept");
-      acceptButton.addEventListener("click", () => {
-        handleStatusChange(appointment.appointment_id, "accepted");
-        displayPopup(
-          `Appointment with ${patientInfo.name} has been accepted.`,
-          "success"
-        );
-        loadPage("appointments");
-      });
-
-      const cancelButton = document.createElement("button");
-      cancelButton.textContent = "Cancel";
-      cancelButton.classList.add("btn-cancel");
-      cancelButton.addEventListener("click", () => {
-        handleStatusChange(appointment.appointment_id, "cancelled");
-        displayPopup(
-          `Appointment with ${patientInfo.name} has been cancelled.`,
-          "success"
-        );
-        loadPage("appointments");
-      });
-
-      appointmentDiv.appendChild(acceptButton);
-      appointmentDiv.appendChild(cancelButton);
-
       // Append the div to the container
       appointmentsContainer.appendChild(appointmentDiv);
     }
@@ -411,29 +406,35 @@ const renderAppointments = async (appointments) => {
   }
 };
 
+// Function to fetch doctor information by ID
+async function fetchDoctorInfoById(doctorId) {
+  try {
+    const response = await fetch(`/api/doctors?doctorId=${doctorId}`);
+    const doctorInfo = await response.json();
+    return doctorInfo[0]; // Assuming the API returns an array of doctors; use the first one
+  } catch (error) {
+    console.error("Error fetching doctor information:", error.message);
+    return null;
+  }
+}
+
 async function fetchPatientInfoById(patientId) {
   try {
     const response = await fetch(`/api/patients?patientId=${patientId}`);
     const patientInfo = await response.json();
-    return patientInfo[0]; // Assuming the API returns an array of patients; use the first one
+    return patientInfo[0]; // Assuming the API returns an array of doctors; use the first one
   } catch (error) {
-    displayPopup(
-      "Error fetching patient information:" + error.message,
-      "error"
-    );
+    console.error("Error fetching doctor information:", error.message);
+    return null;
   }
 }
 
 // Function to fetch and render appointments
 const fetchAppointments = async (status = null) => {
-  const token = sessionStorage.getItem("jwt");
-
   try {
-    const url = status
-      ? `/auth/doctor-appointments?status=${status}`
-      : "/auth/doctor-appointments";
+    const token = sessionStorage.getItem("jwt");
 
-    const response = await fetch(url, {
+    const response = await fetch("/auth/appointments-info", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -443,68 +444,68 @@ const fetchAppointments = async (status = null) => {
 
     if (response.ok) {
       const data = await response.json();
-      return data.appointments;
+      return data; // Return the fetched data
     } else {
-      displayPopup(
-        "Error fetching appointments: " + response.statusText,
-        "error"
-      );
-      return null;
-    }
-  } catch (error) {
-    displayPopup("Unexpected error: " + error.message, "error");
-    return null;
-  }
-};
-
-const fetchAndRenderAppointments = async (status = null) => {
-  try {
-    const appointments = await fetchAppointments(status);
-
-    if (appointments) {
-      // Render the appointments in the "appointments-container" div
-      renderAppointments(appointments);
-    }
-  } catch (error) {
-    displayPopup(
-      "Error fetching and rendering appointments: " + error.message,
-      "error"
-    );
-  }
-};
-
-const handleStatusChange = async (appointmentId, newStatus) => {
-  try {
-    const token = sessionStorage.getItem("jwt");
-
-    const response = await fetch(
-      "http://localhost:8080/auth/update-appointment-status",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ appointmentId, newStatus }),
-      }
-    );
-
-    if (response.ok) {
-      const data = await response.json();
-    } else {
-      displayPopup(
+      console.error(
         "Error response: " + response.status + response.statusText,
         "error"
       );
+      return null; // Return null if there is an error
     }
   } catch (error) {
-    displayPopup("Unexpected error: " + error, "error");
+    console.error("Unexpected error: " + error, "error");
+    return null; // Return null in case of an exception
   }
 };
 
-// Functii folosite exclusiv in "appointments.ejs"
+const fetchAndRenderAppointments = async () => {
+  try {
+    const [doctors, patients, appointmentsData] = await Promise.all([
+      fetch("/api/doctors").then((response) => response.json()),
+      fetch("/api/patients").then((response) => response.json()),
+      fetch("/auth/appointments-info", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessionStorage.getItem("jwt")}`,
+        },
+      }).then((response) => response.json()),
+    ]);
 
-// Preluarea informatiilor legate de doctori, cu filtrare
+    if (appointmentsData.success) {
+      const mergedAppointments = mergeAppointmentsData(
+        appointmentsData.appointments,
+        doctors,
+        patients
+      );
+
+      // Render the appointments in the "appointments-container" div
+      renderAppointments(mergedAppointments);
+    } else {
+      console.error("Error retrieving appointments:", appointmentsData.error);
+    }
+  } catch (error) {
+    console.error("Error fetching and rendering appointments:", error.message);
+  }
+};
+
+const mergeAppointmentsData = (appointments, doctors, patients) => {
+  return appointments.map((appointment) => {
+    const doctorInfo = doctors.find(
+      (doctor) => doctor.id === appointment.doctor_id
+    );
+    const patientInfo = patients.find(
+      (patient) => patient.id === appointment.patient_id
+    );
+
+    return {
+      ...appointment,
+      doctor: doctorInfo,
+      patient: patientInfo,
+    };
+  });
+};
+
 async function fetchAndRenderPatients(searchQuery = "") {
   try {
     const activePage = document
@@ -515,36 +516,26 @@ async function fetchAndRenderPatients(searchQuery = "") {
       return;
     }
 
-    // Fetch appointments
-    const appointments = await fetchAppointments();
-
     const response = await fetch("/api/patients");
     const patients = await response.json();
 
+    console.log(patients);
+
     // Pass appointments to renderPatients
-    renderPatients(patients, searchQuery, appointments);
+    renderPatients(patients, searchQuery);
   } catch (error) {
-    displayPopup("Error fetching and rendering patients: " + error, "error");
+    console.log("Error fetching and rendering patients: " + error, "error");
   }
 }
 
-// Generarea cartonaselor cu doctori
-function renderPatients(patients, searchQuery = "", appointments) {
+// Generarea cartonaselor cu pacienti
+function renderPatients(patients, searchQuery = "") {
   const patientsContainer = document.querySelector(".patients-container");
 
   patientsContainer.innerHTML = "";
 
   patients.forEach((patient) => {
-    // Check if the patient has accepted appointments
-    const hasAcceptedAppointments = appointments.some(
-      (appointment) =>
-        appointment.patient_id.toString() === patient.id.toString()
-    );
-
-    if (
-      patient.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      hasAcceptedAppointments
-    ) {
+    if (patient.name.toLowerCase().includes(searchQuery.toLowerCase())) {
       const patientElement = document.createElement("div");
       patientElement.classList.add("patient-container-element");
 
@@ -582,44 +573,126 @@ function renderPatients(patients, searchQuery = "", appointments) {
   });
 }
 
-async function openMedicalFile(patientId) {
-  const token = sessionStorage.getItem("jwt");
-
+async function fetchAndRenderDoctors(searchQuery = "") {
   try {
-    // Fetch all patient data including medical file information
-    const response = await fetch(`/api/patients?patientId=${patientId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const activePage = document
+      .querySelector(".menu-item.active")
+      .getAttribute("data-page");
 
-    if (response.ok) {
-      const patientData = await response.json();
-
-      // Check if patientData is an array and not empty
-      if (Array.isArray(patientData) && patientData.length > 0) {
-        const medicalFileData = patientData[0]; // Assuming medical file info is within the patient data
-
-        // Populate the HTML elements with medical file data
-        populateMedicalFileData(medicalFileData);
-      } else {
-        displayPopup(
-          "Error fetching patient information:" + patientData,
-          "error"
-        );
-      }
-    } else {
-      displayPopup(
-        "Error fetching patient information: " + response.statusText,
-        "error"
-      );
+    if (activePage !== "doctors") {
+      return;
     }
+
+    const response = await fetch("/api/doctors");
+    const doctors = await response.json();
+
+    console.log(doctors);
+
+    renderDoctors(doctors, searchQuery);
   } catch (error) {
-    displayPopup("Unexpected error:" + error, "error");
+    console.error("Error fetching and rendering doctors:", error);
   }
 }
+
+// Generarea cartonaselor cu doctori
+function renderDoctors(doctors, searchQuery = "") {
+  const doctorsContainer = document.querySelector(".doctors-container");
+
+  if (!doctorsContainer) {
+    console.error("Error: doctorsContainer is null");
+    return;
+  }
+
+  doctorsContainer.innerHTML = "";
+
+  doctors.forEach((doctor) => {
+    if (
+      doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doctor.specialization.toLowerCase().includes(searchQuery.toLowerCase())
+    ) {
+      const doctorElement = document.createElement("div");
+      doctorElement.classList.add("doctors-container-element");
+
+      const doctorImageContainer = document.createElement("div");
+      doctorImageContainer.classList.add("doctor-img-container");
+
+      const doctorImage = document.createElement("img");
+      doctorImage.src = imageFolderPath + doctor.image;
+      doctorImage.alt = doctor.name;
+      doctorImageContainer.appendChild(doctorImage);
+
+      // Append the image container to the main container
+      doctorElement.appendChild(doctorImageContainer);
+
+      const doctorName = document.createElement("h3");
+      doctorName.textContent = doctor.name;
+      doctorElement.appendChild(doctorName);
+
+      const doctorSpecialization = document.createElement("p");
+      doctorSpecialization.textContent = doctor.specialization;
+      doctorElement.appendChild(doctorSpecialization);
+
+      const doctorClinic = document.createElement("p");
+      doctorClinic.textContent = doctor.clinic;
+      doctorElement.appendChild(doctorClinic);
+
+      const appointmentButton = document.createElement("button");
+      appointmentButton.textContent = "Make Appointment";
+      appointmentButton.addEventListener("click", () =>
+        openAppointmentForm(doctor)
+      );
+
+      const doctorIdInput = document.createElement("input");
+      doctorIdInput.type = "hidden";
+      doctorIdInput.name = "doctorId";
+      doctorIdInput.value = doctor.id;
+      doctorElement.appendChild(doctorIdInput);
+
+      doctorElement.appendChild(appointmentButton);
+
+      doctorsContainer.appendChild(doctorElement);
+    }
+  });
+}
+
+// async function openMedicalFile(patientId) {
+//   const token = sessionStorage.getItem("jwt");
+
+//   try {
+//     // Fetch all patient data including medical file information
+//     const response = await fetch(`/api/patients?patientId=${patientId}`, {
+//       method: "GET",
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+
+//     if (response.ok) {
+//       const patientData = await response.json();
+
+//       // Check if patientData is an array and not empty
+//       if (Array.isArray(patientData) && patientData.length > 0) {
+//         const medicalFileData = patientData[0]; // Assuming medical file info is within the patient data
+
+//         // Populate the HTML elements with medical file data
+//         populateMedicalFileData(medicalFileData);
+//       } else {
+//         console.log(
+//           "Error fetching patient information:" + patientData,
+//           "error"
+//         );
+//       }
+//     } else {
+//       console.log(
+//         "Error fetching patient information: " + response.statusText,
+//         "error"
+//       );
+//     }
+//   } catch (error) {
+//     console.log("Unexpected error:" + error, "error");
+//   }
+// }
 
 function capitalizeFirstLetter(input) {
   if (typeof input !== "string" || input.length === 0) {
@@ -629,188 +702,61 @@ function capitalizeFirstLetter(input) {
   return input.charAt(0).toUpperCase() + input.slice(1);
 }
 
-function formatName(name) {
-  const words = name.split(" ");
-  const capitalizedWords = words.map((word) => capitalizeFirstLetter(word));
-  return capitalizedWords.join(" ");
-}
+// function formatName(name) {
+//   const words = name.split(" ");
+//   const capitalizedWords = words.map((word) => capitalizeFirstLetter(word));
+//   return capitalizedWords.join(" ");
+// }
 
-function populateMedicalFileData(data) {
-  const formattedName = data.name ? formatName(data.name) : "";
-  const formattedGender = data.gender ? capitalizeFirstLetter(data.gender) : "";
-  const formattedCity = data.city ? formatName(data.city) : "";
-  document.getElementById("patientId").value = data.id;
-  document.getElementById("name").value = formattedName;
-  document.getElementById("gender").value = formattedGender;
-  document.getElementById("city").value = formattedCity;
-  document.getElementById("phone").value = data.phone;
-  document.getElementById("email").value = data.email;
-  document.getElementById("age").value = calculateAge(data.birthday) || "";
-  document.getElementById("height").value = data.height || "";
-  document.getElementById("weight").value = data.weight || "";
-  const diagnosticsList = data.diagnostics ? data.diagnostics.split(",") : [];
-  const medicationsList = data.medications ? data.medications.split(",") : [];
+// function populateMedicalFileData(data) {
+//   const formattedName = data.name ? formatName(data.name) : "";
+//   const formattedGender = data.gender ? capitalizeFirstLetter(data.gender) : "";
+//   const formattedCity = data.city ? formatName(data.city) : "";
+//   document.getElementById("patientId").value = data.id;
+//   document.getElementById("name").value = formattedName;
+//   document.getElementById("gender").value = formattedGender;
+//   document.getElementById("city").value = formattedCity;
+//   document.getElementById("phone").value = data.phone;
+//   document.getElementById("email").value = data.email;
+//   document.getElementById("age").value = calculateAge(data.birthday) || "";
+//   document.getElementById("height").value = data.height || "";
+//   document.getElementById("weight").value = data.weight || "";
+//   const diagnosticsList = data.diagnostics ? data.diagnostics.split(",") : [];
+//   const medicationsList = data.medications ? data.medications.split(",") : [];
 
-  const diagnosticsContainer = document.getElementById("diagnosticsList");
-  diagnosticsContainer.innerHTML = "";
+//   const diagnosticsContainer = document.getElementById("diagnosticsList");
+//   diagnosticsContainer.innerHTML = "";
 
-  diagnosticsList.forEach((diagnostic) => {
-    const diagnosticItem = document.createElement("li");
-    diagnosticItem.textContent = capitalizeFirstLetter(diagnostic);
-    const deleteButton = document.createElement("span");
-    deleteButton.innerHTML = "&times;";
-    deleteButton.className = "delete-button";
-    deleteButton.onclick = function () {
-      diagnosticItem.remove();
-    };
-    diagnosticItem.appendChild(deleteButton);
-    diagnosticsContainer.appendChild(diagnosticItem);
-  });
+//   diagnosticsList.forEach((diagnostic) => {
+//     const diagnosticItem = document.createElement("li");
+//     diagnosticItem.textContent = capitalizeFirstLetter(diagnostic);
+//     diagnosticsContainer.appendChild(diagnosticItem);
+//   });
 
-  const medicationsContainer = document.getElementById("medicationsList");
-  medicationsContainer.innerHTML = "";
+//   const medicationsContainer = document.getElementById("medicationsList");
+//   medicationsContainer.innerHTML = "";
 
-  medicationsList.forEach((medication) => {
-    const medicationItem = document.createElement("li");
-    medicationItem.textContent = capitalizeFirstLetter(medication);
-    const deleteButton = document.createElement("span");
-    deleteButton.innerHTML = "&times;";
-    deleteButton.className = "delete-button";
-    deleteButton.onclick = function () {
-      medicationItem.remove();
-    };
-    medicationItem.appendChild(deleteButton);
-    medicationsContainer.appendChild(medicationItem);
-  });
-}
+//   medicationsList.forEach((medication) => {
+//     const medicationItem = document.createElement("li");
+//     medicationItem.textContent = capitalizeFirstLetter(medication);
+//     medicationsContainer.appendChild(medicationItem);
+//   });
+// }
 
-function calculateAge(birthday) {
-  const birthDate = new Date(birthday);
-  const currentDate = new Date();
-  let age = currentDate.getFullYear() - birthDate.getFullYear();
-  if (
-    currentDate.getMonth() < birthDate.getMonth() ||
-    (currentDate.getMonth() === birthDate.getMonth() &&
-      currentDate.getDate() < birthDate.getDate())
-  ) {
-    age--;
-  }
+// function calculateAge(birthday) {
+//   const birthDate = new Date(birthday);
+//   const currentDate = new Date();
+//   let age = currentDate.getFullYear() - birthDate.getFullYear();
+//   if (
+//     currentDate.getMonth() < birthDate.getMonth() ||
+//     (currentDate.getMonth() === birthDate.getMonth() &&
+//       currentDate.getDate() < birthDate.getDate())
+//   ) {
+//     age--;
+//   }
 
-  return age;
-}
-
-function addNewDiagnostic() {
-  const newDiagnosticInput = document.getElementById("newDiagnostic");
-  const newDiagnostic = newDiagnosticInput.value.trim();
-
-  if (newDiagnostic) {
-    const diagnosticsContainer = document.getElementById("diagnosticsList");
-    const diagnosticItem = createListItem(capitalizeFirstLetter(newDiagnostic));
-    diagnosticsContainer.appendChild(diagnosticItem);
-    newDiagnosticInput.value = "";
-    sortListAlphabetically(diagnosticsContainer);
-  }
-}
-
-function addNewMedication() {
-  const newMedicationInput = document.getElementById("newMedication");
-  const newMedication = newMedicationInput.value.trim();
-
-  if (newMedication) {
-    const medicationsContainer = document.getElementById("medicationsList");
-    const medicationItem = createListItem(capitalizeFirstLetter(newMedication));
-    medicationsContainer.appendChild(medicationItem);
-    newMedicationInput.value = "";
-    sortListAlphabetically(medicationsContainer);
-  }
-}
-
-function createListItem(text) {
-  const listItem = document.createElement("li");
-  listItem.textContent = text;
-
-  // Create a delete button (using &times;)
-  const deleteButton = document.createElement("span");
-  deleteButton.innerHTML = "&times;";
-  deleteButton.className = "delete-button";
-  deleteButton.onclick = function () {
-    listItem.remove();
-  };
-
-  // Append the delete button to the item
-  listItem.appendChild(deleteButton);
-
-  return listItem;
-}
-
-function sortListAlphabetically(container) {
-  const listItems = Array.from(container.getElementsByTagName("li"));
-  const sortedItems = listItems.sort((a, b) =>
-    a.textContent.localeCompare(b.textContent)
-  );
-  container.innerHTML = "";
-  sortedItems.forEach((item) =>
-    container.appendChild(capitalizeFirstLetter(item))
-  );
-}
-
-function prepareMedicalFileData() {
-  const patientId = document.getElementById("patientId").value;
-  const age = document.getElementById("age").value;
-  const height = document.getElementById("height").value;
-  const weight = document.getElementById("weight").value;
-  const diagnosticsListItems = document.querySelectorAll("#diagnosticsList li");
-  const medicationsListItems = document.querySelectorAll("#medicationsList li");
-
-  const sanitizeText = (text) => text.replace(/[^a-zA-Z0-9\s,]/g, "");
-
-  const diagnostics = Array.from(diagnosticsListItems)
-    .map((item) => sanitizeText(item.textContent))
-    .join(",");
-
-  const medications = Array.from(medicationsListItems)
-    .map((item) => sanitizeText(item.textContent))
-    .join(",");
-
-  return {
-    patientId,
-    age,
-    height,
-    weight,
-    diagnostics,
-    medications,
-  };
-}
-
-async function saveMedicalFile() {
-  try {
-    const token = sessionStorage.getItem("jwt");
-    // Call the prepareMedicalFileData function to get the prepared data
-    const medicalFileData = prepareMedicalFileData();
-
-    // Add logic to send the medical file data to the database using fetch or any other method
-    const response = await fetch("/auth/update-medical-file", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(medicalFileData),
-    });
-
-    if (response.ok) {
-      displayPopup(`Medical File saved successfully!`, "success");
-    } else {
-      displayPopup(
-        "Error saving medical file data:" + response.statusText,
-        "error"
-      );
-      // Handle the error appropriately
-    }
-  } catch (error) {
-    displayPopup("Unexpected error:" + error, "error");
-  }
-}
+//   return age;
+// }
 
 // Functii folosite exclusiv in "settings.ejs"
 
