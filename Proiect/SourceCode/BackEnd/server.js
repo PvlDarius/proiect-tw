@@ -307,6 +307,14 @@ app.get("/admin/patients", authMiddleware, checkUserRole, (req, res) => {
   }
 });
 
+app.get("/admin/medical-file", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "admin") {
+    res.render("../Admin/medical-file");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
 app.get("/admin/settings", authMiddleware, checkUserRole, (req, res) => {
   if (req.userRole === "admin") {
     res.render("../Admin/settings");

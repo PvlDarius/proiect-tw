@@ -140,9 +140,9 @@ async function loadPage(page, patientId) {
       await fetchUserSettings();
     }
 
-    // if (page === "medical-file") {
-    //   openMedicalFile(patientId);
-    // }
+    if (page === "medical-file") {
+      openMedicalFile(patientId);
+    }
   } catch (error) {
     console.log("Error loading page: " + error.message, "error");
   }
@@ -325,28 +325,6 @@ const renderAppointments = async (appointments) => {
   // Clear existing content
   appointmentsContainer.innerHTML = "";
 
-  const statusFilterLabel = document.createElement("label");
-  statusFilterLabel.setAttribute("for", "statusFilter");
-  statusFilterLabel.textContent = "Filter by Status:";
-  const statusFilterSelect = document.createElement("select");
-  statusFilterSelect.setAttribute("id", "statusFilter");
-  statusFilterSelect.innerHTML = `
-    <option value="">All</option>
-    <option value="pending">Pending</option>
-    <option value="accepted">Accepted</option>
-    <option value="cancelled">Cancelled</option>
-  `;
-  statusFilterSelect.addEventListener("change", () => {
-    // Filter appointments based on status
-    const selectedStatus = statusFilterSelect.value.toLowerCase();
-    const filteredAppointments = appointments.filter(
-      (appointment) =>
-        selectedStatus === "" ||
-        appointment.status.toLowerCase() === selectedStatus
-    );
-    renderAppointments(filteredAppointments);
-  });
-
   // Check if there are appointments
   if (appointments && appointments.length > 0) {
     // Iterate over each appointment and create div elements
@@ -354,7 +332,6 @@ const renderAppointments = async (appointments) => {
       const appointmentDiv = document.createElement("div");
       appointmentDiv.classList.add("appointment-element");
 
-      // Fetch doctor information
       const doctorInfo = await fetchDoctorInfoById(appointment.doctor_id);
 
       // Fetch patient information
@@ -380,8 +357,9 @@ const renderAppointments = async (appointments) => {
         <p>Status: <span class="status-color">${appointment.status.toUpperCase()}</span></p>
       `;
 
-      // Set background color based on status
       const statusColor = appointmentDiv.querySelector(".status-color");
+
+      // Set background color based on status
       switch (appointment.status.toLowerCase()) {
         case "pending":
           statusColor.style.backgroundColor = "yellow";
@@ -397,6 +375,34 @@ const renderAppointments = async (appointments) => {
           // Handle other statuses if needed
           break;
       }
+
+      const acceptButton = document.createElement("button");
+      acceptButton.textContent = "Accept";
+      acceptButton.classList.add("btn-accept");
+      acceptButton.addEventListener("click", () => {
+        handleStatusChange(appointment.appointment_id, "accepted");
+        displayPopup(
+          `Appointment with ${patientInfo.name} has been accepted.`,
+          "success"
+        );
+        fetchAndRenderAppointments(); // Refresh appointments after status change
+      });
+
+      const cancelButton = document.createElement("button");
+      cancelButton.textContent = "Cancel";
+      cancelButton.classList.add("btn-cancel");
+      cancelButton.addEventListener("click", () => {
+        handleStatusChange(appointment.appointment_id, "cancelled");
+        displayPopup(
+          `Appointment with ${patientInfo.name} has been cancelled.`,
+          "success"
+        );
+        fetchAndRenderAppointments(); // Refresh appointments after status change
+      });
+
+      appointmentDiv.appendChild(acceptButton);
+      appointmentDiv.appendChild(cancelButton);
+
       // Append the div to the container
       appointmentsContainer.appendChild(appointmentDiv);
     }
@@ -458,6 +464,32 @@ const fetchAppointments = async (status = null) => {
   }
 };
 
+// Function to apply filters
+const applyFilters = (appointments, status) => {
+  // Filter based on status
+  const filteredByStatus = appointments.filter(
+    (appointment) =>
+      status === "" || appointment.status.toLowerCase() === status
+  );
+
+  // Order based on date
+  // if (order === "latest") {
+  //   // Order by the latest appointments first
+  //   return filteredByStatus.sort(
+  //     (a, b) => new Date(b.appointment_date) - new Date(a.appointment_date)
+  //   );
+  // } else if (order === "oldest") {
+  //   // Order by the oldest appointments first
+  //   return filteredByStatus.sort(
+  //     (a, b) => new Date(a.appointment_date) - new Date(b.appointment_date)
+  //   );
+  // } else {
+  // No specific order, return as is
+  return filteredByStatus;
+  //}
+};
+
+// Modify the fetchAndRenderAppointments function
 const fetchAndRenderAppointments = async () => {
   try {
     const [doctors, patients, appointmentsData] = await Promise.all([
@@ -479,8 +511,24 @@ const fetchAndRenderAppointments = async () => {
         patients
       );
 
+      // Get the selected filter values
+      const selectedStatus = document
+        .getElementById("statusFilter")
+        .value.toLowerCase();
+
+      // const selectedOrder = document
+      //   .getElementById("orderFilter")
+      //   .value.toLowerCase();
+
+      // Apply the filters
+      const filteredAppointments = applyFilters(
+        mergedAppointments,
+        selectedStatus
+        // selectedOrder
+      );
+
       // Render the appointments in the "appointments-container" div
-      renderAppointments(mergedAppointments);
+      renderAppointments(filteredAppointments);
     } else {
       console.error("Error retrieving appointments:", appointmentsData.error);
     }
@@ -519,9 +567,6 @@ async function fetchAndRenderPatients(searchQuery = "") {
     const response = await fetch("/api/patients");
     const patients = await response.json();
 
-    console.log(patients);
-
-    // Pass appointments to renderPatients
     renderPatients(patients, searchQuery);
   } catch (error) {
     console.log("Error fetching and rendering patients: " + error, "error");
@@ -586,8 +631,6 @@ async function fetchAndRenderDoctors(searchQuery = "") {
     const response = await fetch("/api/doctors");
     const doctors = await response.json();
 
-    console.log(doctors);
-
     renderDoctors(doctors, searchQuery);
   } catch (error) {
     console.error("Error fetching and rendering doctors:", error);
@@ -617,7 +660,7 @@ function renderDoctors(doctors, searchQuery = "") {
       doctorImageContainer.classList.add("doctor-img-container");
 
       const doctorImage = document.createElement("img");
-      doctorImage.src = imageFolderPath + doctor.image;
+      doctorImage.src = "../UserImages/" + doctor.image;
       doctorImage.alt = doctor.name;
       doctorImageContainer.appendChild(doctorImage);
 
@@ -655,44 +698,44 @@ function renderDoctors(doctors, searchQuery = "") {
   });
 }
 
-// async function openMedicalFile(patientId) {
-//   const token = sessionStorage.getItem("jwt");
+async function openMedicalFile(patientId) {
+  const token = sessionStorage.getItem("jwt");
 
-//   try {
-//     // Fetch all patient data including medical file information
-//     const response = await fetch(`/api/patients?patientId=${patientId}`, {
-//       method: "GET",
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
+  try {
+    // Fetch all patient data including medical file information
+    const response = await fetch(`/api/patients?patientId=${patientId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-//     if (response.ok) {
-//       const patientData = await response.json();
+    if (response.ok) {
+      const patientData = await response.json();
 
-//       // Check if patientData is an array and not empty
-//       if (Array.isArray(patientData) && patientData.length > 0) {
-//         const medicalFileData = patientData[0]; // Assuming medical file info is within the patient data
+      // Check if patientData is an array and not empty
+      if (Array.isArray(patientData) && patientData.length > 0) {
+        const medicalFileData = patientData[0]; // Assuming medical file info is within the patient data
 
-//         // Populate the HTML elements with medical file data
-//         populateMedicalFileData(medicalFileData);
-//       } else {
-//         console.log(
-//           "Error fetching patient information:" + patientData,
-//           "error"
-//         );
-//       }
-//     } else {
-//       console.log(
-//         "Error fetching patient information: " + response.statusText,
-//         "error"
-//       );
-//     }
-//   } catch (error) {
-//     console.log("Unexpected error:" + error, "error");
-//   }
-// }
+        // Populate the HTML elements with medical file data
+        populateMedicalFileData(medicalFileData);
+      } else {
+        console.log(
+          "Error fetching patient information:" + patientData,
+          "error"
+        );
+      }
+    } else {
+      console.log(
+        "Error fetching patient information: " + response.statusText,
+        "error"
+      );
+    }
+  } catch (error) {
+    console.log("Unexpected error:" + error, "error");
+  }
+}
 
 function capitalizeFirstLetter(input) {
   if (typeof input !== "string" || input.length === 0) {
@@ -702,61 +745,61 @@ function capitalizeFirstLetter(input) {
   return input.charAt(0).toUpperCase() + input.slice(1);
 }
 
-// function formatName(name) {
-//   const words = name.split(" ");
-//   const capitalizedWords = words.map((word) => capitalizeFirstLetter(word));
-//   return capitalizedWords.join(" ");
-// }
+function formatName(name) {
+  const words = name.split(" ");
+  const capitalizedWords = words.map((word) => capitalizeFirstLetter(word));
+  return capitalizedWords.join(" ");
+}
 
-// function populateMedicalFileData(data) {
-//   const formattedName = data.name ? formatName(data.name) : "";
-//   const formattedGender = data.gender ? capitalizeFirstLetter(data.gender) : "";
-//   const formattedCity = data.city ? formatName(data.city) : "";
-//   document.getElementById("patientId").value = data.id;
-//   document.getElementById("name").value = formattedName;
-//   document.getElementById("gender").value = formattedGender;
-//   document.getElementById("city").value = formattedCity;
-//   document.getElementById("phone").value = data.phone;
-//   document.getElementById("email").value = data.email;
-//   document.getElementById("age").value = calculateAge(data.birthday) || "";
-//   document.getElementById("height").value = data.height || "";
-//   document.getElementById("weight").value = data.weight || "";
-//   const diagnosticsList = data.diagnostics ? data.diagnostics.split(",") : [];
-//   const medicationsList = data.medications ? data.medications.split(",") : [];
+function populateMedicalFileData(data) {
+  const formattedName = data.name ? formatName(data.name) : "";
+  const formattedGender = data.gender ? capitalizeFirstLetter(data.gender) : "";
+  const formattedCity = data.city ? formatName(data.city) : "";
+  document.getElementById("patientId").value = data.id;
+  document.getElementById("name").value = formattedName;
+  document.getElementById("gender").value = formattedGender;
+  document.getElementById("city").value = formattedCity;
+  document.getElementById("phone").value = data.phone;
+  document.getElementById("email").value = data.email;
+  document.getElementById("age").value = calculateAge(data.birthday) || "";
+  document.getElementById("height").value = data.height || "";
+  document.getElementById("weight").value = data.weight || "";
+  const diagnosticsList = data.diagnostics ? data.diagnostics.split(",") : [];
+  const medicationsList = data.medications ? data.medications.split(",") : [];
 
-//   const diagnosticsContainer = document.getElementById("diagnosticsList");
-//   diagnosticsContainer.innerHTML = "";
+  const diagnosticsContainer = document.getElementById("diagnosticsList");
+  diagnosticsContainer.innerHTML = "";
 
-//   diagnosticsList.forEach((diagnostic) => {
-//     const diagnosticItem = document.createElement("li");
-//     diagnosticItem.textContent = capitalizeFirstLetter(diagnostic);
-//     diagnosticsContainer.appendChild(diagnosticItem);
-//   });
+  diagnosticsList.forEach((diagnostic) => {
+    const diagnosticItem = document.createElement("li");
+    diagnosticItem.textContent = capitalizeFirstLetter(diagnostic);
+    diagnosticsContainer.appendChild(diagnosticItem);
+  });
 
-//   const medicationsContainer = document.getElementById("medicationsList");
-//   medicationsContainer.innerHTML = "";
+  const medicationsContainer = document.getElementById("medicationsList");
+  medicationsContainer.innerHTML = "";
 
-//   medicationsList.forEach((medication) => {
-//     const medicationItem = document.createElement("li");
-//     medicationItem.textContent = capitalizeFirstLetter(medication);
-//     medicationsContainer.appendChild(medicationItem);
-//   });
-// }
+  medicationsList.forEach((medication) => {
+    const medicationItem = document.createElement("li");
+    medicationItem.textContent = capitalizeFirstLetter(medication);
+    medicationsContainer.appendChild(medicationItem);
+  });
+}
 
-// function calculateAge(birthday) {
-//   const birthDate = new Date(birthday);
-//   const currentDate = new Date();
-//   let age = currentDate.getFullYear() - birthDate.getFullYear();
-//   if (
-//     currentDate.getMonth() < birthDate.getMonth() ||
-//     (currentDate.getMonth() === birthDate.getMonth() &&
-//       currentDate.getDate() < birthDate.getDate())
-//   ) {
-//     age--;
-//   }
+function calculateAge(birthday) {
+  const birthDate = new Date(birthday);
+  const currentDate = new Date();
+  let age = currentDate.getFullYear() - birthDate.getFullYear();
+  if (
+    currentDate.getMonth() < birthDate.getMonth() ||
+    (currentDate.getMonth() === birthDate.getMonth() &&
+      currentDate.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
 
-//   return age;
-// }
+  return age;
+}
 
 // Functii folosite exclusiv in "settings.ejs"
 
