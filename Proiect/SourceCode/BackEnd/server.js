@@ -92,16 +92,11 @@ app.get("/api/doctors", (req, res) => {
 
 app.get("/api/patients", (req, res) => {
   const patientId = req.query.patientId;
-  const userId = req.query.userId;
 
   let query =
     "SELECT * FROM patients JOIN users ON patients.user_id = users.user_id";
 
   if (patientId) {
-    query += " WHERE patients.user_id = ?";
-  }
-
-  if (userId) {
     query += " WHERE patients.user_id = ?";
   }
 
@@ -294,6 +289,14 @@ app.get("/admin/appointments", authMiddleware, checkUserRole, (req, res) => {
 app.get("/admin/doctors", authMiddleware, checkUserRole, (req, res) => {
   if (req.userRole === "admin") {
     res.render("../Admin/doctors");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
+app.get("/admin/add-new-doctor", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "admin") {
+    res.render("../Admin/add-new-doctor");
   } else {
     res.status(403).send("Forbidden");
   }

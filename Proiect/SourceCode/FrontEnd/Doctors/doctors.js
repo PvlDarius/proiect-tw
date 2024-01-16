@@ -123,6 +123,11 @@ async function loadPage(page, patientId) {
     if (page === "medical-file") {
       openMedicalFile(patientId);
     }
+
+    if (page === "home") {
+      await fetchAppointmentsWithinDateRange();
+      await fetchAndRenderAppointments(null, "home");
+    }
   } catch (error) {
     displayPopup("Error loading page: " + error.message, "error");
   }
@@ -297,7 +302,7 @@ function displayNotification(message, type) {
 }
 
 // Update the renderAppointments function to include notifications
-const renderAppointments = async (appointments) => {
+const renderAppointments = async (appointments, page) => {
   const appointmentsContainer = document.getElementById(
     "appointments-container"
   );
@@ -324,7 +329,7 @@ const renderAppointments = async (appointments) => {
         selectedStatus === "" ||
         appointment.status.toLowerCase() === selectedStatus
     );
-    renderAppointments(filteredAppointments);
+    renderAppointments(filteredAppointments, page);
   });
 
   // Check if there are appointments
@@ -350,7 +355,9 @@ const renderAppointments = async (appointments) => {
 
       // Display patient information and appointment details
       appointmentDiv.innerHTML = `
-        <p>Patient: ${patientInfo.name}</p>
+        <p>Patient: ${
+          patientInfo && patientInfo.name ? patientInfo.name : "Unknown"
+        }</p>
         <p>Date: ${formattedDate}</p>
         <p>Time: ${formattedTime}</p>
         <p>Status: <span class="status-color">${appointment.status.toUpperCase()}</span></p>
@@ -414,13 +421,19 @@ const renderAppointments = async (appointments) => {
 async function fetchPatientInfoById(patientId) {
   try {
     const response = await fetch(`/api/patients?patientId=${patientId}`);
+    if (!response.ok) {
+      console.error("Error fetching patient information:", response.statusText);
+      return null;
+    }
+
     const patientInfo = await response.json();
-    return patientInfo[0]; // Assuming the API returns an array of patients; use the first one
+    return patientInfo && patientInfo.length > 0 ? patientInfo[0] : null;
   } catch (error) {
-    displayPopup(
-      "Error fetching patient information:" + error.message,
-      "error"
+    console.error(
+      "Unexpected error fetching patient information:",
+      error.message
     );
+    return null;
   }
 }
 
@@ -457,19 +470,84 @@ const fetchAppointments = async (status = null) => {
   }
 };
 
-const fetchAndRenderAppointments = async (status = null) => {
+const fetchAndRenderAppointments = async (status = null, page) => {
   try {
-    const appointments = await fetchAppointments(status);
+    if (page === "home") {
+      // Get the current date
+      const currentDate = new Date();
+      currentDate.setHours(0, 0, 0, 0); // Set time to midnight
 
-    if (appointments) {
-      // Render the appointments in the "appointments-container" div
-      renderAppointments(appointments);
+      const next7Days = new Date();
+      next7Days.setDate(next7Days.getDate() + 7);
+      next7Days.setHours(23, 59, 59, 999); // Set time to end of the day
+
+      const appointments = await fetchAppointmentsWithinDateRange(
+        currentDate,
+        next7Days,
+        status
+      );
+
+      if (appointments) {
+        // Render the appointments in the "appointments-container" div
+        renderAppointments(appointments);
+      }
+    } else {
+      // Fetch all appointments
+      const appointments = await fetchAppointments(status);
+
+      if (appointments) {
+        // Render the appointments in the "appointments-container" div
+        renderAppointments(appointments);
+      }
     }
   } catch (error) {
     displayPopup(
       "Error fetching and rendering appointments: " + error.message,
       "error"
     );
+  }
+};
+
+// Function to fetch appointments within a specified date range
+const fetchAppointmentsWithinDateRange = async (
+  startDate,
+  endDate,
+  status = null
+) => {
+  const token = sessionStorage.getItem("jwt");
+
+  try {
+    const url = status
+      ? `/auth/doctor-appointments?status=${status}`
+      : "/auth/doctor-appointments";
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      // Filter appointments within the specified date range
+      const filteredAppointments = data.appointments.filter((appointment) => {
+        const appointmentDate = new Date(appointment.appointment_date);
+        return appointmentDate >= startDate && appointmentDate <= endDate;
+      });
+
+      return filteredAppointments;
+    } else {
+      displayPopup(
+        "Error fetching appointments: " + response.statusText,
+        "error"
+      );
+      return null;
+    }
+  } catch (error) {
+    displayPopup("Unexpected error: " + error.message, "error");
+    return null;
   }
 };
 

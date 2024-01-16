@@ -314,15 +314,20 @@ body{
     text-align: center;
     margin: auto;
     margin-top: 1rem;
+    height: 450px;
 }
 
 .patient-container-element img{
     width: 100%;
-    margin-bottom: 5%;
+    height: 100%;
+    border-radius: 50%;
 }
 
 .patient-container-element .patients-img-container{
-    height: 300px;
+    height: 200px;
+    width: 300px;
+    object-fit: contain;
+    border-radius: 50%;
 }
 
 .patients-container button{

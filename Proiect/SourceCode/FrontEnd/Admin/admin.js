@@ -1036,3 +1036,154 @@ function updateUIWithUserSettings(userSettings) {
     notificationToggle.checked = userSettings.receiveNotifications;
   }
 }
+
+function validateNewDoctor() {
+  document.getElementById("validation-message").innerHTML = "";
+
+  const firstName = document.getElementById("first_name").value;
+  const lastName = document.getElementById("last_name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const confirmPassword = document.getElementById("confirmPassword").value;
+  const birthday = document.getElementById("birthday").value;
+  const gender = document.getElementById("gender").value;
+  const city = document.getElementById("city").value;
+  const clinic = document.getElementById("clinic").value;
+  const specialization = document.getElementById("specialization").value;
+
+  if (firstName === "") {
+    document.getElementById("validation-message").innerHTML =
+      "Please enter doctor's first name!";
+    return false;
+  } else if (lastName === "") {
+    document.getElementById("validation-message").innerHTML =
+      "Please enter doctor's last name!";
+    return false;
+  } else if (email === "") {
+    document.getElementById("validation-message").innerHTML =
+      "Please enter doctor's email!";
+    return false;
+  } else if (password === "") {
+    document.getElementById("validation-message").innerHTML =
+      "Please enter a password!";
+    return false;
+  } else if (confirmPassword === "") {
+    document.getElementById("validation-message").innerHTML =
+      "Please confirm doctor's password!";
+    return false;
+  } else if (password !== confirmPassword) {
+    document.getElementById("validation-message").innerHTML =
+      "The entered passwords do not match!";
+    return false;
+  } else if (password.length < 6) {
+    document.getElementById("validation-message").innerHTML =
+      "Password must be at least 6 characters long!";
+    return false;
+  } else if (birthday === "") {
+    document.getElementById("validation-message").innerHTML =
+      "Please enter doctor's birthday!";
+    return false;
+  } else if (!isUserAbove18(birthday)) {
+    document.getElementById("validation-message").innerHTML =
+      "Doctors must be 18 years or older to sign up!";
+    return false;
+  } else if (gender === "placeholder") {
+    document.getElementById("validation-message").innerHTML =
+      "Please select doctor's gender!";
+    return false;
+  } else if (city === "") {
+    document.getElementById("validation-message").innerHTML =
+      "Please enter doctor's city!";
+    return false;
+  } else if (clinic === "") {
+    document.getElementById("validation-message").innerHTML =
+      "Please enter doctor's clinic!";
+    return false;
+  } else if (specialization === "") {
+    document.getElementById("validation-message").innerHTML =
+      "Please enter doctor's specialization!";
+    return false;
+  }
+  // else if (phone === "") {
+  //   document.getElementById("validation-message").innerHTML =
+  //     "Please enter your phone number!";
+  //   return false;
+  // }
+
+  return true;
+}
+
+function isUserAbove18(birthday) {
+  // Parse the birthday string to a Date object
+  const birthDate = new Date(birthday);
+
+  // Calculate the age difference in years
+  const ageDifference = new Date().getFullYear() - birthDate.getFullYear();
+
+  // Check if the user is 18 or older
+  return ageDifference >= 18;
+}
+
+function validateAndSubmitNewDoctor() {
+  const isValidationPassed = validateNewDoctor();
+  if (isValidationPassed) {
+    const formData = {
+      firstName: document.getElementById("first_name").value,
+      lastName: document.getElementById("last_name").value,
+      email: document.getElementById("email").value,
+      password: document.getElementById("password").value,
+      confirmPassword: document.getElementById("confirmPassword").value,
+      birthday: document.getElementById("birthday").value,
+      gender: document.getElementById("gender").value,
+      city: document.getElementById("city").value,
+      clinic: document.getElementById("clinic").value,
+      specialization: document.getElementById("specialization").value,
+    };
+
+    console.log("FormData:", formData);
+    submitForm(formData);
+  } else {
+    return false;
+  }
+}
+
+function submitForm(formData) {
+  fetch("/auth/add-new-doctor", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (data.error) {
+        document.getElementById("validation-message").innerHTML = data.error;
+      } else if (data.success) {
+        document.getElementById("success-message").innerHTML = data.success;
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      // Handle errors
+    });
+}
+
+function togglePasswordVisibility(inputId, toggleTextId) {
+  const passwordInput = document.getElementById(inputId);
+  const toggleText = document.getElementById(toggleTextId);
+
+  // Toggle the 'type' attribute between 'password' and 'text'
+  if (passwordInput.type === "password") {
+    passwordInput.type = "text";
+    toggleText.innerText = "Hide Password";
+  } else {
+    passwordInput.type = "password";
+    toggleText.innerText = "Show Password";
+  }
+}

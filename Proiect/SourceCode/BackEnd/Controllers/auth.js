@@ -1,4 +1,4 @@
-const { signup } = require("./signup");
+const { signup, newDoctor } = require("./signup");
 const { login } = require("./login");
 const {
   forgotPassword,
@@ -18,6 +18,7 @@ const pool = mysql.createPool({
 });
 
 exports.signup = signup;
+exports.newDoctor = newDoctor;
 exports.login = login;
 exports.forgotPassword = forgotPassword;
 exports.resetPassword = resetPassword;

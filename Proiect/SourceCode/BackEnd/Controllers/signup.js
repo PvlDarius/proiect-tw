@@ -97,3 +97,114 @@ exports.signup = async (req, res) => {
     return res.redirect("/signup?errorMessage=Registration failed");
   }
 };
+
+const insertUser = async (userData) => {
+  return new Promise((resolve, reject) => {
+    db.query("INSERT INTO users SET ?", userData, (error, results) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(results.insertId);
+      }
+    });
+  });
+};
+
+const insertDoctor = async (doctorData) => {
+  return new Promise((resolve, reject) => {
+    db.query("INSERT INTO doctors SET ?", doctorData, (error, results) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(results);
+      }
+    });
+  });
+};
+
+exports.newDoctor = async (req, res) => {
+  const {
+    firstName,
+    lastName,
+    email,
+    password,
+    confirmPassword,
+    birthday,
+    gender,
+    city,
+    clinic,
+    specialization,
+  } = req.body;
+
+  if (
+    !firstName ||
+    !lastName ||
+    !email ||
+    !password ||
+    !confirmPassword ||
+    !birthday ||
+    !gender ||
+    !city ||
+    !clinic ||
+    !specialization
+  ) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  try {
+    const results = await db.query("SELECT email FROM users WHERE email = ?", [
+      email,
+    ]);
+
+    if (results.length > 0) {
+      return res.status(400).json({ error: "This email is already used" });
+    } else if (password !== confirmPassword) {
+      return res.status(400).json({ error: "Passwords do not match" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 8);
+
+    // Start a transaction
+    await db.beginTransaction();
+
+    try {
+      // Insert user data into 'users' table
+      const userId = await insertUser({
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        password: hashedPassword,
+        user_role: "doctor",
+        birthday,
+        gender,
+        city,
+        phone: null, // Assuming phone is not applicable to doctors
+      });
+
+      // Insert doctor data into 'doctors' table using the obtained user_id
+      await insertDoctor({
+        user_id: userId,
+        clinic,
+        specialization,
+        // Add other doctor-related fields as needed
+      });
+
+      // Commit the transaction
+      await db.commit();
+
+      return res
+        .status(201)
+        .json({ success: "Doctor registered successfully" });
+    } catch (error) {
+      // Rollback the transaction in case of an error
+      await db.rollback();
+      throw error;
+    }
+  } catch (error) {
+    console.error("Registration error:", error);
+    return res.status(500).json({ error: "Registration failed" });
+  } finally {
+    // Ensure that the connection is released
+    db.end();
+  }
+};
