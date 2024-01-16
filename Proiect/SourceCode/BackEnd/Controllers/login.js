@@ -52,7 +52,7 @@ exports.login = async (req, res) => {
     });
 
     if (user.user_role === "admin") {
-      return res.redirect(`/admin/home?token=${token}`);
+      return res.redirect(`/admin/?token=${token}`);
     } else if (user.user_role === "doctor") {
       return res.redirect(`/doctor/?token=${token}`);
     } else {

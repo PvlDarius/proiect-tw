@@ -1,0 +1,51 @@
+<main class="main-content">
+  <h1>Medical File</h1>
+  <div class="medical-file-container">
+    <input type="hidden" id="patientId" />
+    <div>
+      <label for="name">Name:</label>
+      <input type="text" id="name" />
+    </div>
+    <div>
+      <label for="gender">Gender:</label>
+      <input type="text" id="gender" />
+    </div>
+    <div>
+      <label for="city">City:</label>
+      <input type="text" id="city" />
+    </div>
+    <div>
+      <label for="phone">Phone:</label>
+      <input type="text" id="phone" />
+    </div>
+    <div>
+      <label for="email">Email:</label>
+      <input type="text" id="email" />
+    </div>
+    <div>
+      <label for="age">Age:</label>
+      <input type="text" id="age" />
+    </div>
+    <div>
+      <label for="height">Height:</label>
+      <input type="text" id="height" />
+    </div>
+    <div>
+      <label for="weight">Weight:</label>
+      <input type="text" id="weight" />
+    </div>
+    <div>
+      <label for="diagnostics">Diagnostics:</label>
+      <ul id="diagnosticsList"></ul>
+      <input type="text" id="newDiagnostic" placeholder="Add new diagnostic" />
+      <button onclick="addNewDiagnostic()">Add Diagnostic</button>
+    </div>
+    <div>
+      <label for="medications">Medications:</label>
+      <ul id="medicationsList"></ul>
+      <input type="text" id="newMedication" placeholder="Add new medication" />
+      <button onclick="addNewMedication()">Add Medication</button>
+    </div>
+    <button onclick="saveMedicalFile()">Save Medical File</button>
+  </div>
+</main>

@@ -1,4 +1,4 @@
-const { signup } = require("./signup");
+const { signup, newDoctor } = require("./signup");
 const { login } = require("./login");
 const {
   forgotPassword,
@@ -18,6 +18,7 @@ const pool = mysql.createPool({
 });
 
 exports.signup = signup;
+exports.newDoctor = newDoctor;
 exports.login = login;
 exports.forgotPassword = forgotPassword;
 exports.resetPassword = resetPassword;
@@ -102,32 +103,53 @@ exports.getAppointmentsInfo = async (req, res) => {
     }
 
     const userId = user.userId;
+    const userRole = user.userRole; // Assuming you have a role property in your user object
 
     // Extract filter parameters from query
     const { doctorId, specialization, clinic } = req.query;
 
     // Construct the base query
-    let getAppointmentsQuery =
-      "SELECT * FROM appointments WHERE patient_id = ?";
+    let getAppointmentsQuery;
+
+    if (userRole === "admin") {
+      // Admin can see all appointments
+      getAppointmentsQuery = "SELECT * FROM appointments";
+    } else {
+      // Patients can only see their own appointments
+      getAppointmentsQuery = "SELECT * FROM appointments WHERE patient_id = ?";
+    }
 
     // Add filters to the query if provided
     if (doctorId) {
       getAppointmentsQuery += " AND doctor_id = ?";
-      queryParams.push(doctorId);
     }
 
     if (specialization) {
       getAppointmentsQuery += " AND specialization = ?";
-      queryParams.push(specialization);
     }
 
     if (clinic) {
       getAppointmentsQuery += " AND clinic = ?";
-      queryParams.push(clinic);
     }
 
     // Execute the query with appropriate parameters
-    let queryParams = [userId];
+    let queryParams = [];
+
+    if (userRole !== "admin") {
+      queryParams.push(userId);
+    }
+
+    if (doctorId) {
+      queryParams.push(doctorId);
+    }
+
+    if (specialization) {
+      queryParams.push(specialization);
+    }
+
+    if (clinic) {
+      queryParams.push(clinic);
+    }
 
     const [results] = await pool.execute(getAppointmentsQuery, queryParams);
 

@@ -62,25 +62,42 @@ const checkUserRole = (req, res, next) => {
 };
 
 app.get("/api/doctors", (req, res) => {
-  const doctorId = req.query.doctorId; // Get the doctor ID from query parameters
+  const doctorId = req.query.doctorId;
+  const userId = req.query.userId;
 
   let query =
     "SELECT * FROM doctors JOIN users ON doctors.user_id = users.user_id";
 
-  // If doctorId is provided, add a WHERE clause to filter by doctor ID
-  if (doctorId) {
-    query += " WHERE doctors.doctor_id = ?";
+  // If either doctorId or userId is provided, add a WHERE clause to filter
+  if (doctorId || userId) {
+    query += " WHERE";
+    if (doctorId) {
+      query += " doctors.doctor_id = ?";
+    }
+    if (userId) {
+      query += doctorId ? " OR " : "";
+      query += " doctors.user_id = ?";
+    }
   }
 
-  db.query(query, [doctorId], (error, results) => {
+  const params = [doctorId, userId].filter(Boolean);
+
+  db.query(query, params, (error, results) => {
     if (error) {
       console.error("Error fetching doctors:", error);
       res.status(500).json({ error: "Internal server error" });
     } else {
       const doctorsData = results.map((doctor) => ({
-        id: `${doctor.doctor_id}`,
+        id: doctor.user_id,
+        doctor_id: `${doctor.doctor_id}`,
+        first_name: `${doctor.first_name}`,
+        last_name: `${doctor.last_name}`,
         name: `${doctor.first_name} ${doctor.last_name}`,
         image: doctor.user_image,
+        birthday: doctor.birthday,
+        gender: doctor.gender,
+        city: doctor.city,
+        email: doctor.email,
         specialization: doctor.specialization,
         clinic: doctor.clinic,
       }));
@@ -92,16 +109,11 @@ app.get("/api/doctors", (req, res) => {
 
 app.get("/api/patients", (req, res) => {
   const patientId = req.query.patientId;
-  const userId = req.query.userId;
 
   let query =
     "SELECT * FROM patients JOIN users ON patients.user_id = users.user_id";
 
   if (patientId) {
-    query += " WHERE patients.user_id = ?";
-  }
-
-  if (userId) {
     query += " WHERE patients.user_id = ?";
   }
 
@@ -130,6 +142,80 @@ app.get("/api/patients", (req, res) => {
     }
   });
 });
+
+//   const appointmentId = req.query.appointmentId;
+//   const doctorId = req.query.doctorId;
+//   const patientId = req.query.patientId;
+//   const status = req.query.status;
+
+//   let query =
+//     "SELECT * FROM appointments " +
+//     "JOIN doctors ON appointments.doctor_id = doctors.doctor_id " +
+//     "JOIN patients ON appointments.patient_id = patients.user_id " +
+//     "JOIN users AS doctor_users ON doctors.user_id = doctor_users.user_id " +
+//     "JOIN users AS patient_users ON patients.user_id = patient_users.user_id";
+
+//   const queryParams = [];
+
+//   if (appointmentId) {
+//     query += " WHERE appointments.appointment_id = ?";
+//     queryParams.push(appointmentId);
+//   } else {
+//     if (doctorId) {
+//       query += " WHERE appointments.doctor_id = ?";
+//       queryParams.push(doctorId);
+//     }
+
+//     if (patientId) {
+//       if (queryParams.length > 0) {
+//         query += " AND appointments.patient_id = ?";
+//       } else {
+//         query += " WHERE appointments.patient_id = ?";
+//       }
+//       queryParams.push(patientId);
+//     }
+
+//     if (status) {
+//       if (queryParams.length > 0) {
+//         query += " AND appointments.status = ?";
+//       } else {
+//         query += " WHERE appointments.status = ?";
+//       }
+//       queryParams.push(status);
+//     }
+//   }
+
+//   db.query(query, queryParams, (error, results) => {
+//     if (error) {
+//       console.error("Error fetching appointments:", error);
+//       res.status(500).json({ error: "Internal server error" });
+//     } else {
+//       const appointmentsData = results.map((appointment) => ({
+//         id: `${appointment.appointment_id}`,
+//         doctor: {
+//           id: `${appointment.doctor_id}`,
+//           name: `${appointment.first_name} ${appointment.last_name}`,
+//           image: appointment.user_image,
+//           specialization: appointment.specialization,
+//           clinic: appointment.clinic,
+//         },
+//         patient: {
+//           id: `${appointment.patient_id}`,
+//           name: `${appointment.first_name} ${appointment.last_name}`,
+//           image: appointment.user_image,
+//           age: appointment.age,
+//           height: appointment.height,
+//           weight: appointment.weight,
+//         },
+//         date: appointment.appointment_date,
+//         hour: appointment.appointment_hour,
+//         status: appointment.status,
+//       }));
+
+//       res.json(appointmentsData);
+//     }
+//   });
+// });
 
 app.get("/api/statistics", (req, res) => {
   let doctorsCount, patientsCount, hospitalsCount, diagnosticsCount;
@@ -193,9 +279,73 @@ app.get("/join", (req, res) => {
 app.use(checkUserRole);
 app.use(authMiddleware);
 
+app.get("/admin/", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "admin") {
+    res.render("../Admin/admin-frame");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
 app.get("/admin/home", authMiddleware, checkUserRole, (req, res) => {
   if (req.userRole === "admin") {
-    res.render("../Admin/admin-home");
+    res.render("../Admin/home");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
+app.get("/admin/appointments", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "admin") {
+    res.render("../Admin/appointments");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
+app.get("/admin/account-info", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "admin") {
+    res.render("../Admin/account-info");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
+app.get("/admin/doctors", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "admin") {
+    res.render("../Admin/doctors");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
+app.get("/admin/add-new-doctor", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "admin") {
+    res.render("../Admin/add-new-doctor");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
+app.get("/admin/patients", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "admin") {
+    res.render("../Admin/patients");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
+app.get("/admin/medical-file", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "admin") {
+    res.render("../Admin/medical-file");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
+app.get("/admin/settings", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "admin") {
+    res.render("../Admin/settings");
   } else {
     res.status(403).send("Forbidden");
   }

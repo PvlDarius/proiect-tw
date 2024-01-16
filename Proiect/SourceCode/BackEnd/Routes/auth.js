@@ -35,6 +35,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.post("/signup", authController.signup);
+router.post("/add-new-doctor", authController.newDoctor);
 router.post("/login", authController.login);
 router.post("/forgot-password", authController.forgotPassword);
 router.post("/reset-password", authController.resetPassword);
@@ -430,6 +431,81 @@ router.post("/update-medical-file", async (req, res) => {
   } catch (error) {
     // Handle unexpected errors
     console.error("Error updating medical file:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/update-user-info", async (req, res) => {
+  try {
+    // Extract data from the request body
+    const { userId, firstName, lastName, birthday, gender, city, email } =
+      req.body;
+
+    // Update the common user information in the database
+    const updateQuery =
+      "UPDATE users SET first_name = ?, last_name = ?, birthday = ?, gender = ?, city = ?, email = ? WHERE user_id = ?";
+
+    db.query(
+      updateQuery,
+      [firstName, lastName, birthday, gender, city, email, userId],
+      (updateError, updateResults) => {
+        if (updateError) {
+          console.error("Error updating user information:", updateError);
+          return res.status(500).json({ error: "Internal server error" });
+        }
+
+        // Check if any rows were affected
+        if (updateResults.affectedRows === 0) {
+          // If no rows were affected, the user may not exist
+          return res.status(404).json({ error: "User not found" });
+        }
+
+        // Send a success response
+        res
+          .status(200)
+          .json({ message: "User information updated successfully" });
+      }
+    );
+  } catch (error) {
+    // Handle unexpected errors
+    console.error("Error updating user information:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.post("/update-doctor-info", async (req, res) => {
+  try {
+    // Extract data from the request body
+    const { userId, specialization, clinic } = req.body;
+
+    // Update the doctor-specific information in the database
+    const updateQuery =
+      "UPDATE doctors SET specialization = ?, clinic = ? WHERE user_id = ?";
+
+    db.query(
+      updateQuery,
+      [specialization, clinic, userId],
+      (updateError, updateResults) => {
+        if (updateError) {
+          console.error("Error updating doctor information:", updateError);
+          return res.status(500).json({ error: "Internal server error" });
+        }
+
+        // Check if any rows were affected
+        if (updateResults.affectedRows === 0) {
+          // If no rows were affected, the doctor may not exist
+          return res.status(404).json({ error: "Doctor not found" });
+        }
+
+        // Send a success response
+        res
+          .status(200)
+          .json({ message: "Doctor information updated successfully" });
+      }
+    );
+  } catch (error) {
+    // Handle unexpected errors
+    console.error("Error updating doctor information:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });

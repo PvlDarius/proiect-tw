@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/Admin/admin.css" />
+    <link rel="icon" href="../Images/heart-pulse-solid.svg" />
+    <script
+      src="https://kit.fontawesome.com/88f38507d4.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <title>Home</title>
+  </head>
+  <body>
+    <div class="menu-toggle">
+      <div class="hamburger">
+        <span></span>
+      </div>
+    </div>
+
+    <%- include('sidebar') %>
+
+    <main class="main-content" id="main-content-container"></main>
+
+    <div id="popup" class="popup">
+      <div class="popup-header">
+        <p id="popupHeader"></p>
+        <span class="close-button" onclick="togglePopup()">&times;</span>
+      </div>
+      <div class="popup-content">
+        <p id="popupMessage"></p>
+        <div id="countdown">
+          <div id="countdown-number"></div>
+          <svg>
+            <circle r="18" cx="20" cy="20"></circle>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div id="overlay"></div>
+    <script defer src="/Admin/admin.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+  </body>
+</html>

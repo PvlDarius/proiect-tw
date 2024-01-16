@@ -1,0 +1,52 @@
+<aside class="sidebar">
+  <div class="logo">
+    <i class="fa-solid fa-heart-pulse"></i>
+    <span>ClinicApp</span>
+  </div>
+  <div class="user" id="user-details">
+    <img src="../Images/default_image.png" alt="user-image" class="user-img" />
+    <div>
+      <p class="bold" id="user-name">FirstName LastName</p>
+      <p class="user-role" id="user-role">User role</p>
+    </div>
+  </div>
+  <nav class="menu">
+    <a href="/admin/home" class="menu-item active" data-page="home">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </a>
+    <a href="/admin/appointments" class="menu-item" data-page="appointments">
+      <i class="fa-solid fa-calendar-days" data-page="appointments"></i>
+      <span>Appointments</span>
+    </a>
+    <a href="/admin/patients" class="menu-item" data-page="patients">
+      <i class="fa-solid fa-hospital-user"></i>
+      <span>Patients</span>
+    </a>
+    <a href="/admin/doctors" class="menu-item" data-page="doctors">
+      <i class="fa-solid fa-hospital-user"></i>
+      <span>Doctors</span>
+    </a>
+    <a href="/admin/settings" class="menu-item" data-page="settings">
+      <i class="fa-solid fa-gear"></i>
+      <span>Settings</span>
+    </a>
+    <a href="/auth/logout" class="menu-item" data-page="logout">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      <span>Logout</span>
+    </a>
+  </nav>
+  <audio id="backgroundAudio" autoplay loop>
+    <source
+      src="../Music/10_Minute_Deep_Healing_Meditation_Music_for_Positive_Energy_Relax_Mind_Body_Stress_Relief.mp3"
+      type="audio/mpeg"
+    />
+    <!-- Your browser does not support the audio tag. -->
+  </audio>
+  <script>
+    document.addEventListener("DOMContentLoaded", (event) => {
+      const backgroundAudio = document.getElementById("backgroundAudio");
+      backgroundAudio.volume = 0.1; // Set volume to 50%
+    });
+  </script>
+</aside>

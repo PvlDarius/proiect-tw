@@ -1,0 +1,131 @@
+<h2 class="signup-text">Add New Doctor</h2>
+<p
+  id="validation-message"
+  class="validation-message"
+  style="margin-left: 2rem; margin-bottom: 1rem"
+></p>
+<p
+  id="success-message"
+  class="success-message"
+  style="margin-left: 2rem; margin-bottom: 1rem"
+></p>
+<div class="grid">
+  <div class="column1">
+    <div class="input-box">
+      <i class="fa-solid fa-user"></i>
+      <input
+        type="text"
+        id="first_name"
+        name="first_name"
+        placeholder="First Name"
+      />
+      <label id="first_name-validation"></label>
+    </div>
+
+    <div class="input-box">
+      <i class="fa-solid fa-users"></i>
+      <input
+        type="text"
+        id="last_name"
+        name="last_name"
+        placeholder="Last Name"
+      />
+      <label id="last_name-validation"></label>
+    </div>
+
+    <div class="input-box">
+      <i class="fa-solid fa-users"></i>
+      <input
+        type="text"
+        id="specialization"
+        name="specialization"
+        placeholder="Specialization"
+      />
+      <label id="specialization"></label>
+    </div>
+
+    <div class="input-box">
+      <i class="fa-solid fa-users"></i>
+      <input type="text" id="clinic" name="clinic" placeholder="Clinic" />
+      <label id="clinic"></label>
+    </div>
+
+    <div class="input-box">
+      <i class="fa-solid fa-calendar-days"></i>
+      <input type="date" id="birthday" name="birthday" />
+      <label id="birthday-validation"></label>
+    </div>
+
+    <div class="input-box">
+      <i class="fa-solid fa-venus-mars"></i>
+      <select name="gender" id="gender">
+        <option value="placeholder">Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <div class="input-box">
+      <i class="fa-solid fa-city"></i>
+      <input type="text" id="city" name="city" placeholder="City" />
+    </div>
+  </div>
+
+  <div class="column2">
+    <!-- <div class="input-box">
+        <i class="fa-solid fa-phone"></i>
+        <input id="phone" type="tel" name="phone" />
+      </div> -->
+
+    <div class="input-box">
+      <i class="fa-solid fa-envelope"></i>
+      <input type="email" id="email" name="email" placeholder="Email" />
+      <label id="email-validation"></label>
+    </div>
+
+    <div class="input-box">
+      <i class="fa-solid fa-lock"></i>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder="Password"
+      />
+      <label id="password-validation"></label>
+    </div>
+    <p
+      class="toggle-password-text"
+      id="passwordToggleText"
+      onclick="togglePasswordVisibility('password', 'passwordToggleText')"
+    >
+      Show Password
+    </p>
+    <div class="input-box">
+      <i class="fa-solid fa-lock"></i>
+      <input
+        type="password"
+        id="confirmPassword"
+        name="confirmPassword"
+        placeholder="Confirm Password"
+      />
+      <label id="confirmPassword-validation"></label>
+    </div>
+    <p
+      class="toggle-password-text"
+      id="confirmPasswordToggleText"
+      onclick="togglePasswordVisibility('confirmPassword', 'confirmPasswordToggleText')"
+    >
+      Show Password
+    </p>
+  </div>
+</div>
+<br /><br />
+<div class="submit-button" id="btn">
+  <input
+    class="button"
+    type="button"
+    onclick="validateAndSubmitNewDoctor()"
+    value="Submit"
+  />
+</div>
