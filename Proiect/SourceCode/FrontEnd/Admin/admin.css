@@ -271,7 +271,7 @@ body{
 
 .doctors-container-element .doctor-img-container{
     height: 200px;
-    width: 300px;
+    max-width: 300px;
     object-fit: contain;
     border-radius: 50%;
 }
@@ -296,10 +296,9 @@ body{
 }
 
 .patients-container{
-    padding: 1rem;
-    align-items: center;
-    justify-content: center;
+    position: relative;
     display: block;
+    max-width: 100%;
 }
 
 .patients-container > * {
@@ -748,19 +747,5 @@ svg circle {
     }
     .sidebar.is-active{
         left: 0;
-    }
-}
-
-@media only screen and (min-width:960px){
-    .appointments-container{
-        display: grid;
-        grid-template-columns: auto auto;
-        grid-column-gap: 2rem;
-    }
-
-    .patients-container{
-        display: grid;
-        grid-template-columns: auto auto;
-        grid-column-gap: 2rem;
     }
 }

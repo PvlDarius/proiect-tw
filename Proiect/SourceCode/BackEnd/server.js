@@ -62,25 +62,42 @@ const checkUserRole = (req, res, next) => {
 };
 
 app.get("/api/doctors", (req, res) => {
-  const doctorId = req.query.doctorId; // Get the doctor ID from query parameters
+  const doctorId = req.query.doctorId;
+  const userId = req.query.userId;
 
   let query =
     "SELECT * FROM doctors JOIN users ON doctors.user_id = users.user_id";
 
-  // If doctorId is provided, add a WHERE clause to filter by doctor ID
-  if (doctorId) {
-    query += " WHERE doctors.doctor_id = ?";
+  // If either doctorId or userId is provided, add a WHERE clause to filter
+  if (doctorId || userId) {
+    query += " WHERE";
+    if (doctorId) {
+      query += " doctors.doctor_id = ?";
+    }
+    if (userId) {
+      query += doctorId ? " OR " : "";
+      query += " doctors.user_id = ?";
+    }
   }
 
-  db.query(query, [doctorId], (error, results) => {
+  const params = [doctorId, userId].filter(Boolean);
+
+  db.query(query, params, (error, results) => {
     if (error) {
       console.error("Error fetching doctors:", error);
       res.status(500).json({ error: "Internal server error" });
     } else {
       const doctorsData = results.map((doctor) => ({
-        id: `${doctor.doctor_id}`,
+        id: doctor.user_id,
+        doctor_id: `${doctor.doctor_id}`,
+        first_name: `${doctor.first_name}`,
+        last_name: `${doctor.last_name}`,
         name: `${doctor.first_name} ${doctor.last_name}`,
         image: doctor.user_image,
+        birthday: doctor.birthday,
+        gender: doctor.gender,
+        city: doctor.city,
+        email: doctor.email,
         specialization: doctor.specialization,
         clinic: doctor.clinic,
       }));
@@ -281,6 +298,14 @@ app.get("/admin/home", authMiddleware, checkUserRole, (req, res) => {
 app.get("/admin/appointments", authMiddleware, checkUserRole, (req, res) => {
   if (req.userRole === "admin") {
     res.render("../Admin/appointments");
+  } else {
+    res.status(403).send("Forbidden");
+  }
+});
+
+app.get("/admin/account-info", authMiddleware, checkUserRole, (req, res) => {
+  if (req.userRole === "admin") {
+    res.render("../Admin/account-info");
   } else {
     res.status(403).send("Forbidden");
   }

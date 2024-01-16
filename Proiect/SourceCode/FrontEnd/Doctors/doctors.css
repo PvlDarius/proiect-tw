@@ -182,7 +182,7 @@ body{
 }
 
 .appointment-element .status-color{
-    color: #fafafa;
+    color: #1B1B1B;
 }
 
 .appointment-element .btn-accept, .appointment-element .btn-cancel{
@@ -222,10 +222,9 @@ body{
 }
 
 .patients-container{
-    padding: 1rem;
-    align-items: center;
-    justify-content: center;
+    position: relative;
     display: block;
+    max-width: 100%;
 }
 
 .patients-container > * {
@@ -244,11 +243,15 @@ body{
 
 .patient-container-element img{
     width: 100%;
-    margin-bottom: 5%;
+    height: 100%;
+    border-radius: 50%;
 }
 
-.patient-container-element .patients-img-container{
-    height: 300px;
+.patient-container-element .doctor-img-container{
+    height: 200px;
+    max-width: 300px;
+    object-fit: contain;
+    border-radius: 50%;
 }
 
 .patients-container button{
@@ -300,6 +303,94 @@ body{
 
 .search-container .fa-times{
     cursor: pointer;
+}
+
+.file-info-container{
+    background: #f5f5f5;
+    padding: 5px 10px;
+    border-radius: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.file-info{
+    padding: 5px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.file-info .input-box{
+    width: 400px;
+}
+
+.rounded-box {
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    overflow: hidden;
+}
+  
+.rounded-box input {
+    flex: 1;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px 0 0 5px;
+    outline: none;
+}
+  
+.rounded-box button {
+    padding: 5px 10px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    box-shadow: 3px 0 10px rgba(0,0,0,.5);
+    transition: 0.3s;
+}
+  
+.small-button {
+    color: #fafafa;
+    background: #3471B8;
+    padding: 5px 10px;
+    height: 25px; 
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    font-size: 14px; 
+    cursor: pointer;
+    box-shadow: 3px 0 10px rgba(0,0,0,.5);
+    transition: 0.3s;
+    margin-top: 10px; 
+    margin-bottom: 10px; 
+}
+
+.save-button{
+    width: 300px;
+}
+  
+.button:hover, .small-button:hover {
+    background: #214976;
+}
+
+.fa-comment-medical, .fa-pills{
+    font-size: 20px;
+    color: #3471B8;
+}
+
+.diagnosticsList, .medicationsList{
+    text-align: left;
+    font-size: 20px;
+}
+
+.delete-button{
+    margin-left: 2rem;
+    font-size: 26px;
+    cursor: pointer;
+}
+
+#newDiagnostic, #newMedication{
+    font-size: 16px;
+    border-radius: 5px;
+    margin-right: 0.7rem;
 }
 
 #profile-settings{
@@ -676,19 +767,5 @@ svg circle {
     }
     .sidebar.is-active{
         left: 0;
-    }
-}
-
-@media only screen and (min-width:960px){
-    .appointments-container{
-        display: grid;
-        grid-template-columns: auto auto;
-        grid-column-gap: 2rem;
-    }
-
-    .patients-container{
-        display: grid;
-        grid-template-columns: auto auto;
-        grid-column-gap: 2rem;
     }
 }

@@ -1,47 +1,51 @@
 <main class="main-content">
   <h1>My Medical File</h1>
-  <div class="medical-file-container">
+  <div class="file-info-container file-container">
+    <div class="setting file-info">
+      <form id="fileForm">
     <input type="hidden" id="patientId" />
-    <div>
-      <label for="name">Name:</label>
+    <div class="input-box">
+      <i class="fa-solid fa-user"></i>
       <input type="text" id="name" readonly />
     </div>
-    <div>
-      <label for="gender">Gender:</label>
+    <div class="input-box">
+      <i class="fa-solid fa-venus-mars" style="z-index: 100;"></i>
       <input type="text" id="gender" readonly />
     </div>
-    <div>
-      <label for="city">City:</label>
+    <div class="input-box">
+      <i class="fa-solid fa-city"></i>
       <input type="text" id="city" readonly />
     </div>
-    <div>
-      <label for="phone">Phone:</label>
+    <div class="input-box">
+      <i class="fa-solid fa-phone"></i>      
       <input type="text" id="phone" readonly />
     </div>
-    <div>
-      <label for="email">Email:</label>
+    <div class="input-box">
+      <i class="fa-solid fa-envelope"></i>
       <input type="text" id="email" readonly />
     </div>
-    <div>
-      <label for="age">Age:</label>
+    <div class="input-box">
+      <i class="fa-solid fa-calendar-days" style="z-index: 100;"></i>
       <input type="text" id="age" readonly />
     </div>
-    <div>
-      <label for="height">Height:</label>
+    <div class="input-box">
+      <i class="fa-solid fa-ruler-vertical"></i>      
       <input type="text" id="height" />
     </div>
-    <div>
-      <label for="weight">Weight:</label>
+    <div class="input-box">
+      <i class="fa-solid fa-weight-scale"></i>
       <input type="text" id="weight" />
     </div>
-    <div>
+    <div class="input-box">
       <label for="diagnostics">Diagnostics:</label>
       <ul id="diagnosticsList"></ul>
     </div>
 
-    <div>
+    <div class="input-box">
       <label for="medications">Medications:</label>
       <ul id="medicationsList"></ul>
+    </form>
+    </div>
     </div>
   </div>
 </main>

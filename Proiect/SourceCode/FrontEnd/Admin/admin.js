@@ -73,7 +73,7 @@ function setActiveLink(page) {
 }
 
 // Functie care incarca continutul paginii alese din sidebar
-async function loadPage(page, patientId) {
+async function loadPage(page, userId, userType) {
   try {
     const response = await fetch(`/admin/${page}`);
     const pageContent = await response.text();
@@ -141,7 +141,13 @@ async function loadPage(page, patientId) {
     }
 
     if (page === "medical-file") {
-      openMedicalFile(patientId);
+      openMedicalFile(userId);
+    }
+
+    if (page === "account-info") {
+      console.log("User ID:", userId);
+      console.log("User Type:", userType);
+      await openAccountForm(userType, userId);
     }
   } catch (error) {
     console.log("Error loading page: " + error.message, "error");
@@ -680,15 +686,23 @@ function renderDoctors(doctors, searchQuery = "") {
       doctorElement.appendChild(doctorClinic);
 
       const appointmentButton = document.createElement("button");
-      appointmentButton.textContent = "Make Appointment";
+      appointmentButton.textContent = "Open account info";
       appointmentButton.addEventListener("click", () =>
-        openAppointmentForm(doctor)
+        loadPage("account-info", doctor.id, "doctors")
       );
+
+      const userIdInput = document.createElement("input");
+      userIdInput.type = "hidden";
+      userIdInput.name = "userId";
+      userIdInput.id = "userId"; // Add this line
+      userIdInput.value = doctor.id;
+      doctorElement.appendChild(userIdInput);
+      console.log("Setting User ID:", doctor.id);
 
       const doctorIdInput = document.createElement("input");
       doctorIdInput.type = "hidden";
       doctorIdInput.name = "doctorId";
-      doctorIdInput.value = doctor.id;
+      doctorIdInput.value = doctor.doctor_id; // Use the correct property
       doctorElement.appendChild(doctorIdInput);
 
       doctorElement.appendChild(appointmentButton);
@@ -696,6 +710,222 @@ function renderDoctors(doctors, searchQuery = "") {
       doctorsContainer.appendChild(doctorElement);
     }
   });
+}
+
+async function openAccountForm(userType, userId) {
+  const infoContainer = document.getElementById("account-info-container");
+
+  // Fetch user information based on userType and userId
+  try {
+    console.log("Received User ID:", userId);
+    console.log("Received User Type:", userType);
+    const response = await fetch(`/api/${userType}?userId=${userId}`);
+
+    const userData = await response.json();
+
+    console.log("User Data:", userData); // Log the user data
+
+    if (!userData) {
+      console.error("Error fetching user information");
+      return;
+    }
+
+    // Populate values for common inputs
+    // Populate values for common inputs
+    // Populate values for common inputs
+    const commonInputs = [
+      { id: "first_name", dataKey: "first_name" },
+      { id: "last_name", dataKey: "last_name" },
+      { id: "birthday", dataKey: "birthday" },
+      { id: "gender", dataKey: "gender" },
+      { id: "city", dataKey: "city" },
+      { id: "email", dataKey: "email" },
+    ];
+
+    if (userData.length > 0) {
+      commonInputs.forEach((inputInfo) => {
+        const inputElement = document.getElementById(inputInfo.id);
+        if (inputElement) {
+          // Use individual property if available, otherwise use 'name'
+          const inputValue =
+            inputInfo.dataKey === "birthday"
+              ? formatDate(
+                  userData[0]?.[inputInfo.dataKey] || userData[0]?.["name"]
+                )
+              : userData[0]?.[inputInfo.dataKey] || userData[0]?.["name"];
+
+          // Populate input value if the user data and input element exist
+          if (inputValue) {
+            inputElement.value = inputValue;
+          }
+        }
+      });
+    } else {
+      console.error("User data is empty");
+    }
+
+    // Doctor-specific inputs
+    if (userType === "doctors") {
+      // Fetch doctor information from the API
+      const doctorResponse = await fetch(`/api/doctors?userId=${userId}`);
+      const doctorData = await doctorResponse.json();
+
+      console.log("Doctor Data:", doctorData); // Log the doctor data
+
+      if (doctorData && doctorData.length > 0) {
+        const doctor = doctorData[0];
+
+        // Create and append specialization input
+        const specializationInput = document.createElement("input");
+        specializationInput.type = "text";
+        specializationInput.id = "specialization";
+        specializationInput.name = "specialization";
+        specializationInput.value = doctor.specialization || "";
+        const specializationLabel = document.createElement("label");
+        specializationLabel.textContent = "Specialization";
+        const specializationBox = createInputBox(
+          specializationInput,
+          specializationLabel
+        );
+        infoContainer.appendChild(specializationBox);
+
+        // Create and append clinic input
+        const clinicInput = document.createElement("input");
+        clinicInput.type = "text";
+        clinicInput.id = "clinic";
+        clinicInput.name = "clinic";
+        clinicInput.value = doctor.clinic || "";
+        const clinicLabel = document.createElement("label");
+        clinicLabel.textContent = "Clinic";
+        const clinicBox = createInputBox(clinicInput, clinicLabel);
+        infoContainer.appendChild(clinicBox);
+      }
+    }
+
+    // Create the button dynamically
+    const saveAccountButton = document.createElement("button");
+    saveAccountButton.textContent = "Update Account Info";
+    saveAccountButton.addEventListener("click", async () => {
+      await saveAccountInfo(userType, userId);
+    });
+    infoContainer.appendChild(saveAccountButton);
+  } catch (error) {
+    console.error("Error fetching user information:", error);
+  }
+}
+
+function createInputBox(inputElement, labelElement) {
+  const inputBox = document.createElement("div");
+  inputBox.classList.add("input-box");
+  inputBox.appendChild(labelElement);
+  inputBox.appendChild(inputElement);
+  return inputBox;
+}
+
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+async function saveAccountInfo(userType, userId) {
+  try {
+    console.log("User ID:", userId);
+
+    // Extract values from common inputs
+    const firstName = document.getElementById("first_name").value;
+    const lastName = document.getElementById("last_name").value;
+    const birthday = document.getElementById("birthday").value;
+    const gender = document.getElementById("gender").value;
+    const city = document.getElementById("city").value;
+    const email = document.getElementById("email").value;
+
+    // Log the data before sending the request
+    console.log("First Name:", firstName);
+    console.log("Last Name:", lastName);
+    console.log("Birthday:", birthday);
+    console.log("Gender:", gender);
+    console.log("City:", city);
+    console.log("Email:", email);
+
+    // Create data object with common user information
+    const commonUserData = {
+      userId: userId,
+      firstName,
+      lastName,
+      birthday,
+      gender,
+      city,
+      email,
+    };
+
+    // Log the data before sending the request
+    console.log("Common User Data:", commonUserData);
+
+    // Call the API to update common user information
+    const commonUserResponse = await fetch("/auth/update-user-info", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(commonUserData),
+    });
+
+    // Check the response status
+    if (!commonUserResponse.ok) {
+      const commonUserError = await commonUserResponse.json();
+      console.error(
+        "Error updating common user information:",
+        commonUserError.error
+      );
+      // Handle error accordingly
+      return;
+    }
+
+    console.log("Common user information updated successfully");
+
+    // If the user type is 'doctors', update doctor-specific information
+    if (userType === "doctors") {
+      const specialization = document.getElementById("specialization").value;
+      const clinic = document.getElementById("clinic").value;
+
+      // Create data object with doctor-specific information
+      const doctorData = {
+        userId: userId,
+        specialization,
+        clinic,
+      };
+
+      // Log the data before sending the request
+      console.log("Doctor Data:", doctorData);
+
+      // Call the API to update doctor information
+      const doctorResponse = await fetch("/auth/update-doctor-info", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(doctorData),
+      });
+
+      // Check the response status
+      if (!doctorResponse.ok) {
+        const doctorError = await doctorResponse.json();
+        console.error("Error updating doctor information:", doctorError.error);
+        // Handle error accordingly
+        return;
+      }
+
+      console.log("Doctor information updated successfully");
+    }
+
+    // Handle success accordingly
+  } catch (error) {
+    console.error("Error updating account information:", error);
+    // Handle unexpected errors accordingly
+  }
 }
 
 async function openMedicalFile(patientId) {

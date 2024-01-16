@@ -310,10 +310,6 @@ const renderAppointments = async (appointments) => {
   // Clear existing content
   appointmentsContainer.innerHTML = "";
 
-  const appointmentsTitle = document.createElement("h2");
-  appointmentsTitle.innerHTML = "My Appointments";
-  appointmentsContainer.appendChild(appointmentsTitle);
-
   // Check if there are appointments
   if (appointments && appointments.length > 0) {
     // Iterate over each appointment and create div elements
@@ -458,7 +454,7 @@ function renderDoctors(doctors, searchQuery = "") {
       doctorImageContainer.classList.add("doctor-img-container");
 
       const doctorImage = document.createElement("img");
-      doctorImage.src = imageFolderPath + doctor.image;
+      doctorImage.src = "../UserImages/" + doctor.image;
       doctorImage.alt = doctor.name;
       doctorImageContainer.appendChild(doctorImage);
 
@@ -505,8 +501,8 @@ function openAppointmentForm(doctor) {
   // Create appointment form
   const appointmentForm = document.createElement("div");
   appointmentForm.innerHTML = `
+    <button onclick="backToDoctors()" class="back-button">Back</button>
     <div class="appointment-form">
-      <button onclick="backToDoctors()">Back</button>
       <h1>Make Appointment</h1>
       <input type="hidden" id="id" name="id" value="${doctor.id}">
 
